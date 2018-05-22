@@ -1,0 +1,90 @@
+# Package management
+
+#' Attach packages to the library, installing them from CRAN/GitHub if needed
+#'
+#' @param ... (Names) Packages as bare names. If the package is from GitHub,
+#'    include both the username and package name (see examples).
+#' @param update_all (Logical) If `TRUE`, the packages will be re-installed even if they
+#'    already exist in your computer.
+#' @param quiet (Logical) Suppresses most warnings and messages.
+#'
+#' @return Returns `NULL` invisibly.
+#' @export
+#'
+#' @examples
+#' shelf(janitor, DesiQuintans/desiderata, purrr)
+#' 
+#' @md
+shelf <- function(..., update_all = FALSE, quiet = FALSE) {
+    # 1. Get dots (which contains all the packages I want)
+    dots <- rlang::enexprs(...)
+    packages <- as.character(dots)
+
+    # 2. Separate the GitHub packages from the CRAN ones. They'll contain a forward-slash.
+    github_pkgs <- grep("^.*?/.*?$", packages, value = TRUE)
+    github_bare_pkgs <- sub(".*?/", "", github_pkgs)
+    cran_pkgs <- packages[!(packages %in% github_pkgs)]
+    all_pkgs <- append(cran_pkgs, github_bare_pkgs)
+
+    # 3. If not installed, install them.
+    if (update_all == TRUE) {
+        if (length(cran_pkgs) > 0) { 
+            install.packages(cran_pkgs, quiet = quiet) 
+        }
+        
+        if (length(github_pkgs) > 0) { 
+            devtools::install_github(github_pkgs, quiet = quiet) 
+        }
+    } else {
+        cran_missing <- cran_pkgs[which(!cran_pkgs %in% installed.packages()[, 1])]
+        github_missing <- github_pkgs[which(!github_bare_pkgs %in% installed.packages()[, 1])]
+
+        if (length(cran_missing) > 0) {
+            install.packages(cran_missing)
+        }
+
+        if (length(github_missing) > 0) {
+            devtools::install_github(github_pkgs)
+        }
+    }
+
+    # 4. Find the ones that aren't attached yet.
+    already_attached <- (.packages())
+    not_attached <- all_pkgs[which(!all_pkgs %in% already_attached)]
+    
+    # 5. Load them all
+    if (length(not_attached) > 0) {
+        lapply(not_attached, library, character.only = TRUE, quietly = quiet)
+    }
+    
+    return(invisible(NULL))
+}
+
+
+#' Detach (unload) packages from the library
+#'
+#' @param ... (Names) Packages as bare names. If a package comes from GitHub, omit the
+#'    username and provide just the package name.
+#'    
+#' @return Returns `NULL` invisibly.
+#' @export
+#'
+#' @examples
+#' unshelf(janitor, desiderata, purrr)
+#' 
+#' @md
+unshelf <- function(...) {
+    dots <- rlang::enexprs(...)
+    packages <- as.character(dots)
+    
+    package_list <- (.packages())
+    attached_pkgs <- packages[which(packages %in% package_list)]
+    
+    attached_pkgs <- sub("^", "package:", packages)
+    
+    if (length(attached_pkgs) > 0) {
+        lapply(attached_pkgs, detach, unload = TRUE, character.only = TRUE)
+    }
+
+    return(invisible(NULL))
+}
