@@ -16,12 +16,18 @@ already exist in your computer.}
 \item{quiet}{(Logical) Suppresses most warnings and messages.}
 }
 \value{
-Returns \code{NULL} invisibly.
+Invisibly returns \code{devtools::session_info()}, which provides version info about
+your R and package installations.
 }
 \description{
 Attach packages to the library, installing them from CRAN/GitHub if needed
 }
 \examples{
 shelf(janitor, DesiQuintans/desiderata, purrr)
+
+session_info <- shelf(janitor, DesiQuintans/desiderata, purrr)
+print(session_info)
+
+# A table of version information for R and currently-running packages.
 
 }

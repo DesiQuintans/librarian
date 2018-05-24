@@ -8,16 +8,22 @@
 #'    already exist in your computer.
 #' @param quiet (Logical) Suppresses most warnings and messages.
 #'
-#' @return Returns `NULL` invisibly.
+#' @return Invisibly returns `devtools::session_info()`, which provides version info about
+#'    your R and package installations.
 #' @export
 #'
 #' @examples
 #' shelf(janitor, DesiQuintans/desiderata, purrr)
 #' 
+#' session_info <- shelf(janitor, DesiQuintans/desiderata, purrr)
+#' print(session_info)
+#' 
+#' # A table of version information for R and currently-running packages.
+#' 
 #' @md
 shelf <- function(..., update_all = FALSE, quiet = FALSE) {
     # 1. Get dots (which contains all the packages I want)
-    dots <- rlang::enexprs(...)
+    dots <- nse_dots(...)
     packages <- as.character(dots)
 
     # 2. Separate the GitHub packages from the CRAN ones. They'll contain a forward-slash.
@@ -57,7 +63,7 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE) {
         lapply(not_attached, library, character.only = TRUE, quietly = quiet)
     }
     
-    return(invisible(NULL))
+    return(invisible(devtools::session_info()))
 }
 
 
@@ -74,7 +80,7 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE) {
 #' 
 #' @md
 unshelf <- function(...) {
-    dots <- rlang::enexprs(...)
+    dots <- nse_dots(...)
     packages <- as.character(dots)
     
     package_list <- (.packages())

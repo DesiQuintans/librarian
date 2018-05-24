@@ -59,6 +59,57 @@ The `quiet = TRUE` flag can suppress many of the messages that are routinely pri
 shelf(dplyr, DesiQuintans/desiderata, purrr, quiet = TRUE)
 ```
 
+`shelf` invisibly returns `devtools::session_info()`, so you can print it if you like.
+
+``` r
+sesh <- shelf(janitor, DesiQuintans/desiderata, purrr)
+print(sesh)
+
+Session info -----------------------------------------------------------------------------
+ setting  value                       
+ version  R version 3.4.2 (2017-09-28)
+ system   x86_64, mingw32             
+ ui       RStudio (1.1.453)           
+ language (EN)                        
+ collate  English_Australia.1252      
+ tz       Australia/Sydney            
+ date     2018-05-24                  
+
+Packages ---------------------------------------------------------------------------------
+ package    * version date       source        
+ assertthat   0.2.0   2017-04-11 CRAN (R 3.4.2)
+ base       * 3.4.2   2017-09-28 local         
+ bindr        0.1.1   2018-03-13 CRAN (R 3.4.4)
+ bindrcpp     0.2.2   2018-03-29 CRAN (R 3.4.4)
+ compiler     3.4.2   2017-09-28 local         
+ datasets   * 3.4.2   2017-09-28 local         
+ desiderata * 0.2.0   2018-05-23 local         
+ devtools     1.13.5  2018-02-18 CRAN (R 3.4.3)
+ digest       0.6.15  2018-01-28 CRAN (R 3.4.3)
+ dplyr        0.7.5   2018-05-19 CRAN (R 3.4.4)
+ glue         1.2.0   2017-10-29 CRAN (R 3.4.2)
+ graphics   * 3.4.2   2017-09-28 local         
+ grDevices  * 3.4.2   2017-09-28 local         
+ janitor    * 1.0.0   2018-03-22 CRAN (R 3.4.4)
+ librarian  * 1.0.1   2018-05-24 local         
+ magrittr     1.5     2014-11-22 CRAN (R 3.4.2)
+ memoise      1.1.0   2017-04-21 CRAN (R 3.4.3)
+ methods    * 3.4.2   2017-09-28 local         
+ pillar       1.2.1   2018-02-27 CRAN (R 3.4.3)
+ pkgconfig    2.0.1   2017-03-21 CRAN (R 3.4.2)
+ purrr      * 0.2.4   2017-10-18 CRAN (R 3.4.4)
+ R6           2.2.2   2017-06-17 CRAN (R 3.4.2)
+ Rcpp         0.12.17 2018-05-18 CRAN (R 3.4.4)
+ rlang        0.2.0   2018-02-20 CRAN (R 3.4.3)
+ stats      * 3.4.2   2017-09-28 local         
+ tibble       1.4.2   2018-01-22 CRAN (R 3.4.3)
+ tidyselect   0.2.4   2018-02-26 CRAN (R 3.4.3)
+ tools        3.4.2   2017-09-28 local         
+ utils      * 3.4.2   2017-09-28 local         
+ withr        2.1.1   2017-12-19 CRAN (R 3.4.3)
+ yaml         2.1.17  2018-02-27 CRAN (R 3.4.3)
+```
+
 ### `unshelf`
 
 For unshelf, only the package names should be provided.
@@ -66,3 +117,13 @@ For unshelf, only the package names should be provided.
 ``` r
 unshelf(dplyr, desiderata, purrr)
 ```
+
+---
+
+# Changelog
+
+- **1.0.1**
+    - Removed dependency on `rlang`. Only needs `devtools` now.
+    - `shelf()` now returns `devtools::session_info()` invisibly so that you can print it.
+- **1.0.0**
+    - Initial release. Includes `shelf()` and `unshelf()` in feature-complete form.
