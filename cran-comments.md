@@ -17,8 +17,9 @@ win-builder produced 2 identical ERRORs in 2 calls related to utils::install.pac
    >   trying to use CRAN without setting a mirror
    > Calls: shelf -> <Anonymous> -> contrib.url
 
-This appears to be caused by install.packages(..., repos = getOption("repos")) not 
-resolving to a CRAN mirror on the remote machine.
+This might be caused by install.packages(..., repos = getOption("repos")) not resolving
+to a CRAN mirror on the remote machine. This is the default value for this argument.
+
 
 ## Reverse dependencies
 
