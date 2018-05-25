@@ -47,7 +47,9 @@ For CRAN packages, provide the package name as normal. For GitHub packages, prov
 shelf(dplyr, DesiQuintans/desiderata, purrr)
 ```
 
-To force all of the named packages to re-download and re-install, use `update_all = TRUE`.
+To force all of the named packages to re-download and re-install, use `update_all = TRUE`. 
+
+Note that this only updates the named packages, and not their dependencies. To update dependencies also, run `devtools::update_packages(c("pkg1", "pkg2", ...))`. _As usual, be careful when updating packages; your old scripts might need to be updated if packages have changed their function behaviours._
 
 ``` r
 shelf(dplyr, DesiQuintans/desiderata, purrr, update_all = TRUE)
@@ -119,11 +121,3 @@ unshelf(dplyr, desiderata, purrr)
 ```
 
 ---
-
-# Changelog
-
-- **1.0.1**
-    - Removed dependency on `rlang`. Only needs `devtools` now.
-    - `shelf()` now returns `devtools::session_info()` invisibly so that you can print it.
-- **1.0.0**
-    - Initial release. Includes `shelf()` and `unshelf()` in feature-complete form.
