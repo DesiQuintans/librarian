@@ -4,7 +4,8 @@
 \alias{shelf}
 \title{Attach packages to the library, installing them from CRAN/GitHub if needed}
 \usage{
-shelf(..., update_all = FALSE, quiet = FALSE)
+shelf(..., update_all = FALSE, quiet = FALSE,
+  repo = "https://cran.rstudio.com/")
 }
 \arguments{
 \item{...}{(Names) Packages as bare names. If the package is from GitHub,
@@ -14,6 +15,11 @@ include both the username and package name (see examples).}
 already exist in your computer.}
 
 \item{quiet}{(Logical) Suppresses most warnings and messages.}
+
+\item{repo}{(Character) URL to a package repository. By default, the RStudio CRAN
+mirror. RStudio can also set a default mirror via \emph{Options > Packages > Default
+CRAN Mirror}, and you can use that access that setting
+with \code{repo = getOption("repos")}.}
 }
 \value{
 Invisibly returns \code{devtools::session_info()}, which provides version info about

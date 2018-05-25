@@ -3,7 +3,7 @@
 - FIX - Many documentation changes for CRAN submission.
 - FIX - Import `utils` (a default package) for base R's package-handling functions. Omitting this caused warnings in R CMD CHECK.
 - FIX - Bug in `unshelf()` that made it try to unload packages even if they were not loaded.
-
+- ADD - `repo` argument for `shelf()`, which defaults to the RStudio CRAN mirror. Had to add this so that remote tests for CRAN would not fail. Use `repo = getOption("repos")` to use the CRAN mirror that is set in RStudio's settings.
 
 # librarian 1.0.1
 

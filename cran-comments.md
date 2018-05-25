@@ -11,14 +11,14 @@
 There were no ERRORs or WARNINGs or NOTEs for the 3 local R versions that I tested, 
 including R-devel.
 
-win-builder produced 2 identical ERRORs in 2 calls related to utils::install.packages:
+win-builder produced no ERRORs or WARNINGs.
 
-   > Error in contrib.url(repos, "source") : 
-   >   trying to use CRAN without setting a mirror
-   > Calls: shelf -> <Anonymous> -> contrib.url
+win-builder produced 2 NOTEs:
 
-This might be caused by install.packages(..., repos = getOption("repos")) not resolving
-to a CRAN mirror on the remote machine. This is the default value for this argument.
+    1. A spellcheck false-positive for "GitHub" in the TITLE.
+    2. A warning that examples took >10 seconds to run. This is because 'librarian' is
+       a package for download, installing, and attaching other packages, and the examples
+       illustrate these tasks.
 
 
 ## Reverse dependencies

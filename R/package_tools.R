@@ -7,6 +7,10 @@
 #' @param update_all (Logical) If `TRUE`, the packages will be re-installed even if they
 #'    already exist in your computer.
 #' @param quiet (Logical) Suppresses most warnings and messages.
+#' @param repo (Character) URL to a package repository. By default, the RStudio CRAN 
+#'    mirror. RStudio can also set a default mirror via _Options > Packages > Default 
+#'    CRAN Mirror_, and you can use that access that setting 
+#'    with `repo = getOption("repos")`.
 #'
 #' @return Invisibly returns `devtools::session_info()`, which provides version info about
 #'    your R and package installations.
@@ -16,7 +20,7 @@
 #' shelf(janitor, DesiQuintans/desiderata, purrr)
 #' 
 #' @md
-shelf <- function(..., update_all = FALSE, quiet = FALSE) {
+shelf <- function(..., update_all = FALSE, quiet = FALSE, repo = "https://cran.rstudio.com/") {
     # 1. Get dots (which contains all the packages I want)
     dots <- nse_dots(...)
     packages <- as.character(dots)
@@ -30,7 +34,7 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE) {
     # 3. If not installed, install them.
     if (update_all == TRUE) {
         if (length(cran_pkgs) > 0) { 
-            utils::install.packages(cran_pkgs, quiet = quiet) 
+            utils::install.packages(cran_pkgs, quiet = quiet, repos = repo) 
         }
         
         if (length(github_pkgs) > 0) { 
@@ -41,7 +45,7 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE) {
         github_missing <- github_pkgs[which(!github_bare_pkgs %in% utils::installed.packages()[, 1])]
 
         if (length(cran_missing) > 0) {
-            utils::install.packages(cran_missing, quiet = quiet)
+            utils::install.packages(cran_missing, quiet = quiet, repos = repo)
         }
 
         if (length(github_missing) > 0) {
