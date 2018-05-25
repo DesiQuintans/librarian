@@ -1,3 +1,6 @@
 ^CONDUCT\.md$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^cran-comments\.md$
+^LICENSE$
+^NEWS\.md$

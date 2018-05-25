@@ -1,14 +1,17 @@
 Package: librarian
-Title: Librarian - Install, update, and load R packages from CRAN and GitHub with one call
-Version: 1.0.1
-Author: Desi Quintans
-Maintainer: Desi Quintans <science@desiquintans.com>
-Description: Automatically install, update, and load CRAN and GitHub packages in a single
-    function call.
-Depends: R (>= 3.4.2)
-License: GNU GPL 3
+Title: Install, Update, Load Packages from CRAN and GitHub in One Step
+Version: 1.0.2
+Authors@R: as.person(c("Desi Quintans <science@desiquintans.com> [aut, cre]"))
+Description: Automatically install, update, and load 'CRAN' and 'GitHub' packages in a single
+    function call with 'shelf()'. Unload packages with 'unshelf()'. By accepting bare 
+    unquoted names for packages, it's easy to add or remove packages from the list.
+URL: https://github.com/DesiQuintans/librarian
+BugReports: https://github.com/DesiQuintans/librarian/issues
+Depends: R (>= 3.4.0)
+License: GPL-3
 Encoding: UTF-8
 Imports:
-    devtools (>= 1.13.5)
+    devtools (>= 1.13.0),
+    utils (>= 3.4.0)
 LazyData: true
 RoxygenNote: 6.0.1
