@@ -17,6 +17,6 @@ Returns \code{NULL} invisibly.
 Detach (unload) packages from the library
 }
 \examples{
-unshelf(janitor, desiderata, purrr)
+# unshelf(janitor, desiderata, purrr)
 
 }

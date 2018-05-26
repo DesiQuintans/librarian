@@ -1,7 +1,8 @@
 Package: librarian
-Title: Install, Update, Load Packages from CRAN and GitHub in One Step
+Title: Install, Update, Load Packages from CRAN and 'GitHub' in One Step
 Version: 1.0.2
-Authors@R: as.person(c("Desi Quintans <science@desiquintans.com> [aut, cre]"))
+Authors@R: person("Desi", "Quintans", email = "science@desiquintans.com",
+                  role = c("aut", "cre"))
 Description: Automatically install, update, and load 'CRAN' and 'GitHub' packages in a single
     function call with 'shelf()'. Unload packages with 'unshelf()'. By accepting bare 
     unquoted names for packages, it's easy to add or remove packages from the list.

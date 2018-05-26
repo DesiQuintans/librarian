@@ -17,7 +17,7 @@
 #' @export
 #'
 #' @examples
-#' shelf(janitor, DesiQuintans/desiderata, purrr)
+#' # shelf(janitor, DesiQuintans/desiderata, purrr)
 #' 
 #' @md
 shelf <- function(..., update_all = FALSE, quiet = FALSE, repo = "https://cran.rstudio.com/") {
@@ -75,7 +75,7 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, repo = "https://cran.r
 #' @export
 #'
 #' @examples
-#' unshelf(janitor, desiderata, purrr)
+#' # unshelf(janitor, desiderata, purrr)
 #' 
 #' @md
 unshelf <- function(...) {

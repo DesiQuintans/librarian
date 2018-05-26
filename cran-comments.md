@@ -1,3 +1,10 @@
+## Resubmission
+
+This is a resubmission. I have:
+
+    - Put the code for examples in comments so that the examples would not install 
+      packages without user interaction, but users would still be able to learn from them.
+
 ## Test environments
 
 - win-builder R-devel
@@ -13,12 +20,7 @@ including R-devel.
 
 win-builder produced no ERRORs or WARNINGs.
 
-win-builder produced 2 NOTEs:
-
-    1. A spellcheck false-positive for "GitHub" in the TITLE.
-    2. A warning that examples took >10 seconds to run. This is because 'librarian' is
-       a package for download, installing, and attaching other packages, and the examples
-       illustrate these tasks.
+win-builder produced 1 NOTE ("checking CRAN incoming feasibility").
 
 
 ## Reverse dependencies

@@ -29,6 +29,6 @@ your R and package installations.
 Attach packages to the library, installing them from CRAN/GitHub if needed
 }
 \examples{
-shelf(janitor, DesiQuintans/desiderata, purrr)
+# shelf(janitor, DesiQuintans/desiderata, purrr)
 
 }
