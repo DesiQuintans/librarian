@@ -3,14 +3,13 @@
 #' Attach packages to the library, installing them from CRAN/GitHub if needed
 #'
 #' @param ... (Names) Packages as bare names. If the package is from GitHub,
-#'    include both the username and package name (see examples).
+#'    include both the username and package name as UserName/package (see examples).
 #' @param update_all (Logical) If `TRUE`, the packages will be re-installed even if they
 #'    already exist in your computer.
 #' @param quiet (Logical) Suppresses most warnings and messages.
-#' @param repo (Character) URL to a package repository. By default, the RStudio CRAN 
-#'    mirror. RStudio can also set a default mirror via _Options > Packages > Default 
-#'    CRAN Mirror_, and you can use that access that setting 
-#'    with `repo = getOption("repos")`.
+#' @param custom_repo (`FALSE` or Character) Use `FALSE` for the default mirror (in 
+#'    RStudio you can set a default mirror via _Options > Packages > Default CRAN Mirror_). 
+#'    Otherwise, provide the URL to a CRAN mirror (e.g. "https://cran.csiro.au/").
 #'
 #' @return Invisibly returns `devtools::session_info()`, which provides version info about
 #'    your R and package installations.
@@ -20,7 +19,12 @@
 #' # shelf(janitor, DesiQuintans/desiderata, purrr)
 #' 
 #' @md
-shelf <- function(..., update_all = FALSE, quiet = FALSE, repo = "https://cran.rstudio.com/") {
+shelf <- function(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE) {
+    # custom_repo = FALSE instead of NULL because NULL allows installation from local files.
+    if (custom_repo == FALSE) {  
+        custom_repo <- getOption("repos")
+    }
+    
     # 1. Get dots (which contains all the packages I want)
     dots <- nse_dots(...)
     packages <- as.character(dots)
@@ -34,7 +38,7 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, repo = "https://cran.r
     # 3. If not installed, install them.
     if (update_all == TRUE) {
         if (length(cran_pkgs) > 0) { 
-            utils::install.packages(cran_pkgs, quiet = quiet, repos = repo) 
+            utils::install.packages(cran_pkgs, quiet = quiet, repos = custom_repo) 
         }
         
         if (length(github_pkgs) > 0) { 
@@ -45,7 +49,7 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, repo = "https://cran.r
         github_missing <- github_pkgs[which(!github_bare_pkgs %in% utils::installed.packages()[, 1])]
 
         if (length(cran_missing) > 0) {
-            utils::install.packages(cran_missing, quiet = quiet, repos = repo)
+            utils::install.packages(cran_missing, quiet = quiet, repos = custom_repo)
         }
 
         if (length(github_missing) > 0) {

@@ -2,8 +2,8 @@
 
 This is a resubmission. I have:
 
-    - Put the code for examples in comments so that the examples would not install 
-      packages without user interaction, but users would still be able to learn from them.
+    - Put the code for examples in comments so that running the examples would not 
+      install packages unless the user explicitly removed the # tag.
 
 ## Test environments
 
