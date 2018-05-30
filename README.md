@@ -1,24 +1,24 @@
 # librarian
 
+## What is `librarian`?
+
+`librarian` lets you quickly install, update, and attach packages from CRAN and GitHub in the same function call. It has these advantages over base R and other library management packages like `pacman`:
+
+- **It's one function.** 
+    - `shelf(janitor)` --- **NOT** `install.packages("janitor")` and then `library(janitor)`.
+    - `shelf(DesiQuintans/desiderata)` --- **NOT** `install_github("DesiQuintans/desiderata")` and then `library(desiderata)`.
+- **A consistent interface.** It bothered me that `install.packages` can install many packages, but `library` can only attach one at a time. _librarian_ will install and attach them all.
+- **Packages are bare names.** Miss me with those quoted names, they're such a hassle! _librarian_ uses bare names so that it's easier to maintain a large package list.
+
 ## Project participants
 
 -   Desi Quintans (<https://twitter.com/eco_desi>)
 
 Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
 
-## What is `librarian`?
-
-`librarian` lets you quickly install, update, and attach packages from CRAN and GitHub in the same function call. It has these advantages over base R:
-
-- **It's one function.** No `install.packages("janitor")` and then `library(janitor)`, just `shelf(janitor)`.
-- **A consistent interface.** It bothered me that `install.packages` can install many packages, but `library` can only attach one at a time. _librarian_ will install and attach them all.
-- **Packages are bare names.** Miss me with those quoted names, they're such a hassle! _librarian_ uses bare names for convenience.
-
-(PS. I can't believe that 'librarian' is an available name! That's what I'll submit to CRAN with.)
-
 ## Installation
 
-You can install librarian from github with:
+_librarian_ has been submitted to CRAN, and is waiting for approval. For now, you can install _librarian_ from GitHub with:
 
 ``` r
 install.packages("devtools")
