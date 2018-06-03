@@ -1,3 +1,8 @@
+# librarian 1.0.3
+
+- ADD - `unshelf()` can handle the Github Username/packagename format now, instead of requiring the user to provide only the package name. The biggest effect of this change is that if you want to unload your packages, you can now just change your `shelf()` to `unshelf()` and run it.
+- ADD - `shelf()` and `unshelf()` check for duplicates in the package list you provide.
+
 # librarian 1.0.2
 
 - FIX - Many documentation changes for CRAN submission.

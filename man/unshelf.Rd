@@ -7,8 +7,9 @@
 unshelf(...)
 }
 \arguments{
-\item{...}{(Names) Packages as bare names. If a package comes from GitHub, omit the
-username and provide just the package name.}
+\item{...}{(Names) Packages as bare names. For packages that come from GitHub, you can
+keep the username/package format, or omit the username and provide just the package
+name.}
 }
 \value{
 Returns \code{NULL} invisibly.
@@ -17,6 +18,14 @@ Returns \code{NULL} invisibly.
 Detach (unload) packages from the library
 }
 \examples{
+# These are the same:
+
 # unshelf(janitor, desiderata, purrr)
+# unshelf(janitor, DesiQuintans/desiderata, purrr)
+
+# You can quickly unload-reload packages by just changing 'shelf' to 'unshelf'.
+
+#   shelf(janitor, DesiQuintans/desiderata, purrr)
+# unshelf(janitor, DesiQuintans/desiderata, purrr)
 
 }

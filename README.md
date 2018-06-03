@@ -1,6 +1,4 @@
-# librarian
-
-## What is `librarian`?
+# `librarian` - One-step packages from CRAN and GitHub
 
 ``` r
 librarian::shelf(dplyr, DesiQuintans/desiderata, purrr)
@@ -38,6 +36,12 @@ install.packages("devtools")
 devtools::install_github("DesiQuintans/librarian")
 
 library(librarian)
+
+# But instead of attaching librarian, I prefer to use:
+
+librarian::shelf(...)
+
+librarian::unshelf(...)
 ```
 
 ---
@@ -53,7 +57,8 @@ library(librarian)
 
 ### `shelf`
 
-For CRAN packages, provide the package name as normal. For GitHub packages, provide the username and package name separated by `/`.
+For CRAN packages, provide the package name as normal.  
+For GitHub packages, provide the username and package name separated by `/`.
 
 ``` r
 shelf(dplyr, DesiQuintans/desiderata, purrr)
@@ -81,47 +86,59 @@ print(sesh)
 
 #> Session info -----------------------------------------------------------------------------
 #>  setting  value                       
-#>  version  R version 3.4.2 (2017-09-28)
+#>  version  R version 3.5.0 (2018-04-23)
 #>  system   x86_64, mingw32             
 #>  ui       RStudio (1.1.453)           
 #>  language (EN)                        
 #>  collate  English_Australia.1252      
 #>  tz       Australia/Sydney            
-#>  date     2018-05-24                  
+#>  date     2018-06-03                  
 #> 
 #> Packages ---------------------------------------------------------------------------------
-#>  package    * version date       source        
-#>  assertthat   0.2.0   2017-04-11 CRAN (R 3.4.2)
-#>  base       * 3.4.2   2017-09-28 local         
-#>  bindr        0.1.1   2018-03-13 CRAN (R 3.4.4)
-#>  bindrcpp     0.2.2   2018-03-29 CRAN (R 3.4.4)
-#>  compiler     3.4.2   2017-09-28 local         
-#>  datasets   * 3.4.2   2017-09-28 local         
-#>  desiderata * 0.2.0   2018-05-23 local         
-#>  devtools     1.13.5  2018-02-18 CRAN (R 3.4.3)
-#>  digest       0.6.15  2018-01-28 CRAN (R 3.4.3)
-#>  dplyr        0.7.5   2018-05-19 CRAN (R 3.4.4)
-#>  glue         1.2.0   2017-10-29 CRAN (R 3.4.2)
-#>  graphics   * 3.4.2   2017-09-28 local         
-#>  grDevices  * 3.4.2   2017-09-28 local         
-#>  janitor    * 1.0.0   2018-03-22 CRAN (R 3.4.4)
-#>  librarian  * 1.0.1   2018-05-24 local         
-#>  magrittr     1.5     2014-11-22 CRAN (R 3.4.2)
-#>  memoise      1.1.0   2017-04-21 CRAN (R 3.4.3)
-#>  methods    * 3.4.2   2017-09-28 local         
-#>  pillar       1.2.1   2018-02-27 CRAN (R 3.4.3)
-#>  pkgconfig    2.0.1   2017-03-21 CRAN (R 3.4.2)
-#>  purrr      * 0.2.4   2017-10-18 CRAN (R 3.4.4)
-#>  R6           2.2.2   2017-06-17 CRAN (R 3.4.2)
-#>  Rcpp         0.12.17 2018-05-18 CRAN (R 3.4.4)
-#>  rlang        0.2.0   2018-02-20 CRAN (R 3.4.3)
-#>  stats      * 3.4.2   2017-09-28 local         
-#>  tibble       1.4.2   2018-01-22 CRAN (R 3.4.3)
-#>  tidyselect   0.2.4   2018-02-26 CRAN (R 3.4.3)
-#>  tools        3.4.2   2017-09-28 local         
-#>  utils      * 3.4.2   2017-09-28 local         
-#>  withr        2.1.1   2017-12-19 CRAN (R 3.4.3)
-#>  yaml         2.1.17  2018-02-27 CRAN (R 3.4.3)
+#>  package    * version    date       source                             
+#>  assertthat   0.2.0      2017-04-11 CRAN (R 3.5.0)                     
+#>  backports    1.1.2      2017-12-13 CRAN (R 3.5.0)                     
+#>  base       * 3.5.0      2018-04-23 local                              
+#>  bindr        0.1.1      2018-03-13 CRAN (R 3.5.0)                     
+#>  bindrcpp     0.2.2      2018-03-29 CRAN (R 3.5.0)                     
+#>  commonmark   1.5        2018-04-28 CRAN (R 3.5.0)                     
+#>  compiler     3.5.0      2018-04-23 local                              
+#>  datasets   * 3.5.0      2018-04-23 local                              
+#>  desiderata * 0.5.0      2018-06-02 local                              
+#>  devtools     1.13.5     2018-02-18 CRAN (R 3.5.0)                     
+#>  digest       0.6.15     2018-01-28 CRAN (R 3.5.0)                     
+#>  dplyr        0.7.5      2018-05-19 CRAN (R 3.5.0)                     
+#>  evaluate     0.10.1     2017-06-24 CRAN (R 3.5.0)                     
+#>  glue         1.2.0      2017-10-29 CRAN (R 3.5.0)                     
+#>  graphics   * 3.5.0      2018-04-23 local                              
+#>  grDevices  * 3.5.0      2018-04-23 local                              
+#>  htmltools    0.3.6      2017-04-28 CRAN (R 3.5.0)                     
+#>  janitor    * 1.0.0      2018-03-22 CRAN (R 3.5.0)                     
+#>  knitr        1.20       2018-02-20 CRAN (R 3.5.0)                     
+#>  librarian  * 1.0.2      <NA>       local                              
+#>  magrittr     1.5        2014-11-22 CRAN (R 3.5.0)                     
+#>  memoise      1.1.0      2017-04-21 CRAN (R 3.5.0)                     
+#>  methods    * 3.5.0      2018-04-23 local                              
+#>  pillar       1.2.3      2018-05-25 CRAN (R 3.5.0)                     
+#>  pkgconfig    2.0.1      2017-03-21 CRAN (R 3.5.0)                     
+#>  purrr      * 0.2.4      2017-10-18 CRAN (R 3.5.0)                     
+#>  R6           2.2.2      2017-06-17 CRAN (R 3.5.0)                     
+#>  Rcpp         0.12.17    2018-05-18 CRAN (R 3.5.0)                     
+#>  rlang        0.2.0      2018-02-20 CRAN (R 3.5.0)                     
+#>  rmarkdown    1.9        2018-03-01 CRAN (R 3.5.0)                     
+#>  roxygen2     6.0.1      2017-02-06 CRAN (R 3.5.0)                     
+#>  rprojroot    1.3-2      2018-01-03 CRAN (R 3.5.0)                     
+#>  rstudioapi   0.7.0-9000 2018-05-30 Github (rstudio/rstudioapi@12870f8)
+#>  stats      * 3.5.0      2018-04-23 local                              
+#>  stringi      1.1.7      2018-03-12 CRAN (R 3.5.0)                     
+#>  stringr      1.3.1      2018-05-10 CRAN (R 3.5.0)                     
+#>  tibble       1.4.2      2018-01-22 CRAN (R 3.5.0)                     
+#>  tidyselect   0.2.4      2018-02-26 CRAN (R 3.5.0)                     
+#>  tools        3.5.0      2018-04-23 local                              
+#>  utils      * 3.5.0      2018-04-23 local                              
+#>  withr        2.1.2      2018-03-15 CRAN (R 3.5.0)                     
+#>  xml2         1.2.0      2018-01-24 CRAN (R 3.5.0)                     
+#>  yaml         2.1.19     2018-05-01 CRAN (R 3.5.0)    
 ```
 
 ### `unshelf`
@@ -129,11 +146,13 @@ print(sesh)
 When unattaching GitHub packages with `unshelf()`, you can provide the package names only, or you can provide the full username/package identifier as you did with `shelf()`. This lets you quickly unload and reload your current packages by typing `un` in front of `shelf()`.
 
 ``` r
-# These are the same.
+# These are the same:
 
-unshelf(dplyr, desiderata, purrr)
+unshelf(janitor, desiderata, purrr)
+unshelf(janitor, DesiQuintans/desiderata, purrr)
 
-unshelf(dplyr, DesiQuintans/desiderata, purrr)
+# You can quickly unload-reload packages by just changing 'shelf' to 'unshelf'.
+
+  shelf(janitor, DesiQuintans/desiderata, purrr)
+unshelf(janitor, DesiQuintans/desiderata, purrr)
 ```
-
----

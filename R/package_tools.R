@@ -28,6 +28,7 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE) {
     # 1. Get dots (which contains all the packages I want)
     dots <- nse_dots(...)
     packages <- as.character(dots)
+    packages <- unique(packages)
 
     # 2. Separate the GitHub packages from the CRAN ones. They'll contain a forward-slash.
     github_pkgs <- grep("^.*?/.*?$", packages, value = TRUE)
@@ -72,22 +73,34 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE) {
 
 #' Detach (unload) packages from the library
 #'
-#' @param ... (Names) Packages as bare names. If a package comes from GitHub, omit the
-#'    username and provide just the package name.
+#' @param ... (Names) Packages as bare names. For packages that come from GitHub, you can
+#'    keep the username/package format, or omit the username and provide just the package 
+#'    name.
 #'    
 #' @return Returns `NULL` invisibly.
 #' @export
 #'
 #' @examples
+#' # These are the same:
+#' 
 #' # unshelf(janitor, desiderata, purrr)
+#' # unshelf(janitor, DesiQuintans/desiderata, purrr)
+#' 
+#' # You can quickly unload-reload packages by just changing 'shelf' to 'unshelf'.
+#' 
+#' #   shelf(janitor, DesiQuintans/desiderata, purrr)
+#' # unshelf(janitor, DesiQuintans/desiderata, purrr)
 #' 
 #' @md
 unshelf <- function(...) {
     dots <- nse_dots(...)
     packages <- as.character(dots)
     
+    bare_pkgs <- sub(".*?/", "", packages)  # Remove GitHub username component, if any.
+    bare_pkgs <- unique(bare_pkgs)
+    
     package_list <- (.packages())
-    attached_pkgs <- packages[which(packages %in% package_list)]
+    attached_pkgs <- bare_pkgs[which(bare_pkgs %in% package_list)]
 
     attached_pkgs <- sub("^", "package:", attached_pkgs)
     
