@@ -110,3 +110,23 @@ unshelf <- function(...) {
 
     return(invisible(NULL))
 }
+
+#' Detach and then reattach packages
+#'
+#' @param ... (Names) Packages as bare names. For packages that come from GitHub, you can
+#'    keep the username/package format, or omit the username and provide just the package 
+#'    name.
+#'
+#' @return Returns `NULL` invisibly.
+#' @export
+#'
+#' @examples
+#' # reshelf(desiderata)
+#' 
+#' @md
+reshelf <- function(...) {
+    unshelf(...)
+    shelf(...)
+    
+    return(invisible(NULL))
+}

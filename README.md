@@ -50,6 +50,7 @@ librarian::unshelf(...)
 
 - Use `shelf()` to attach packages to the library, installing them from CRAN/GitHub if needed
 - Use `unshelf()` to detach (unload) packages from the library
+- Use `reshelf()` to detach and then reattach packages
 
 ---
 
@@ -143,7 +144,9 @@ print(sesh)
 
 ### `unshelf`
 
-When unattaching GitHub packages with `unshelf()`, you can provide the package names only, or you can provide the full username/package identifier as you did with `shelf()`. This lets you quickly unload and reload your current packages by typing `un` in front of `shelf()`.
+When unattaching GitHub packages with `unshelf()`, you can provide the package names only, or you can provide the full username/package identifier as you did with `shelf()`. 
+
+If you want to refresh a package by detaching and then reattaching it, use `reshelf()`.
 
 ``` r
 # These are the same:
@@ -155,4 +158,17 @@ unshelf(janitor, DesiQuintans/desiderata, purrr)
 
   shelf(janitor, DesiQuintans/desiderata, purrr)
 unshelf(janitor, DesiQuintans/desiderata, purrr)
+```
+
+### `reshelf`
+
+If you maintain a personal package, you'll often find yourself adding a function to it and rebuilding it in one instance of RStudio, and then reloading the new build in a different RStudio instance that contains your actual work. `reshelf()` does this in one line.
+
+``` r
+reshelf(DesiQuintans/desiderata)
+
+# is identical to
+
+unshelf(DesiQuintans/desiderata)
+  shelf(DesiQuintans/desiderata)
 ```

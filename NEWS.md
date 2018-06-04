@@ -1,3 +1,7 @@
+# librarian 1.1.0
+
+- ADD - `reshelf()` for refreshing a package. Useful for loading new builds of your personal package.
+
 # librarian 1.0.3
 
 - ADD - `unshelf()` can handle the Github Username/packagename format now, instead of requiring the user to provide only the package name. The biggest effect of this change is that if you want to unload your packages, you can now just change your `shelf()` to `unshelf()` and run it.
