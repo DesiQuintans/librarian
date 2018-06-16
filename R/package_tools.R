@@ -1,11 +1,11 @@
 # Package management
 
-#' Attach packages to the library, installing them from CRAN/GitHub if needed
+#' Attach packages to the search path, installing them from CRAN or GitHub if needed
 #'
 #' @param ... (Names) Packages as bare names. If the package is from GitHub,
 #'    include both the username and package name as UserName/package (see examples).
 #' @param update_all (Logical) If `TRUE`, the packages will be re-installed even if they
-#'    already exist in your computer.
+#'    are already in your library.
 #' @param quiet (Logical) Suppresses most warnings and messages.
 #' @param custom_repo (`FALSE` or Character) Use `FALSE` for the default mirror (in 
 #'    RStudio you can set a default mirror via _Options > Packages > Default CRAN Mirror_). 
@@ -26,13 +26,12 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE) {
     }
     
     # 1. Get dots (which contains all the packages I want)
-    dots <- nse_dots(...)
-    packages <- as.character(dots)
-    packages <- unique(packages)
+    packages <- nse_dots(..., keep_user = TRUE)
 
     # 2. Separate the GitHub packages from the CRAN ones. They'll contain a forward-slash.
     github_pkgs <- grep("^.*?/.*?$", packages, value = TRUE)
     github_bare_pkgs <- sub(".*?/", "", github_pkgs)
+    
     cran_pkgs <- packages[!(packages %in% github_pkgs)]
     all_pkgs <- append(cran_pkgs, github_bare_pkgs)
 
@@ -71,7 +70,7 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE) {
 }
 
 
-#' Detach (unload) packages from the library
+#' Detach (unload) packages from the search path
 #'
 #' @param ... (Names) Packages as bare names. For packages that come from GitHub, you can
 #'    keep the username/package format, or omit the username and provide just the package 
@@ -86,18 +85,9 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE) {
 #' # unshelf(janitor, desiderata, purrr)
 #' # unshelf(janitor, DesiQuintans/desiderata, purrr)
 #' 
-#' # You can quickly unload-reload packages by just changing 'shelf' to 'unshelf'.
-#' 
-#' #   shelf(janitor, DesiQuintans/desiderata, purrr)
-#' # unshelf(janitor, DesiQuintans/desiderata, purrr)
-#' 
 #' @md
 unshelf <- function(...) {
-    dots <- nse_dots(...)
-    packages <- as.character(dots)
-    
-    bare_pkgs <- sub(".*?/", "", packages)  # Remove GitHub username component, if any.
-    bare_pkgs <- unique(bare_pkgs)
+    bare_pkgs <- nse_dots(..., keep_user = FALSE)
     
     package_list <- (.packages())
     attached_pkgs <- bare_pkgs[which(bare_pkgs %in% package_list)]
@@ -111,7 +101,7 @@ unshelf <- function(...) {
     return(invisible(NULL))
 }
 
-#' Detach and then reattach packages
+#' Detach and then reattach packages to the search path
 #'
 #' @param ... (Names) Packages as bare names. For packages that come from GitHub, you can
 #'    keep the username/package format, or omit the username and provide just the package 
