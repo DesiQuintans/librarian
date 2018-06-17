@@ -85,6 +85,7 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE) {
 }
 
 
+
 #' Detach (unload) packages from the search path
 #'
 #' @param ... (Names) Packages as bare names. For packages that come from GitHub, you can
@@ -93,6 +94,12 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE) {
 #' @param everything (Logical) If this is `TRUE`, detach every non-default package 
 #'    including librarian. Any names in `...` are ignored. The default packages can 
 #'    be listed with `getOption("defaultPackages")`.
+#' @param also_depends (Logical) If this is `TRUE`, also detach the dependencies of the 
+#'    packages listed in `...`. This can be slow.
+#' @param safe (Logical) If this is `TRUE`, packages won't be detached if they are needed 
+#'    by other packages that are **not** listed in `...`.
+#' @param quiet (Logical) If this is `FALSE`, show a message when packages can't be 
+#'    detached because they are still needed by other packages.
 #'    
 #' @return Invisibly returns a named logical vector, where the names are the packages 
 #'    and `TRUE` means that the package was successfully detached.
@@ -118,28 +125,63 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE) {
 #' #> TRUE      TRUE
 #' 
 #' @md
-unshelf <- function(..., everything = FALSE) {
+unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, quiet = TRUE) {
     attached <- check_attached()
     
     if (everything == TRUE) {
         # Detach everything that isn't a base package.
-        base_pkgs <- c(getOption("defaultPackages"), "base")  # Base is not a default package!
+        base_pkgs <- c(getOption("defaultPackages"), "base")  # Base is absent from the list
         to_detach <- attached[which(!attached %in% base_pkgs)]
     } else {
-        # Detach only the packages that are listed.
-        bare_pkgs <- nse_dots(..., keep_user = FALSE)
-        to_detach <- bare_pkgs[which(bare_pkgs %in% attached)]
+        # Detach only the packages that are requested.
+        pkgs_chosen <- nse_dots(..., keep_user = FALSE)
+        
+        # If chosen, also detach the dependencies of the listed packages.
+        if (also_depends == TRUE) {
+            # Get the dependency list of the packages named in ...
+            deps_chosen <- tools::package_dependencies(pkgs_chosen, which = c("Depends", "Imports"))
+            deps_chosen <- unique(unname(unlist(deps_chosen)))
+            
+            # Don't detach the default packages.
+            deps_chosen <- deps_chosen[which(!deps_chosen %in% c(getOption("defaultPackages"), "base"))]
+            
+            pkgs_chosen <- unique(append(pkgs_chosen, deps_chosen))
+        }
+        
+        to_detach <- pkgs_chosen[which(pkgs_chosen %in% attached)]
+
+        # If chosen, don't detach packages that other still-attached packages need.
+        if (safe == TRUE) {
+            # Get the dependency list of the attached packages NOT named in ...
+            pkgs_remaining <- attached[which(!attached %in% pkgs_chosen)]
+            deps_remaining <- tools::package_dependencies(pkgs_remaining, which = c("Depends", "Imports"))
+            deps_remaining <- unique(unname(unlist(deps_remaining)))
+
+            to_detach <- to_detach[which(!to_detach %in% deps_remaining)]
+        }
     }
     
     # Need to add a "package:" descriptor to the start of names for detach().
     to_detach_prefixed <- sub("^", "package:", to_detach)
     
     if (length(to_detach_prefixed) > 0) {
-        lapply(to_detach_prefixed, detach, unload = TRUE, character.only = TRUE)
+        suppressWarnings(
+            lapply(to_detach_prefixed, detach, unload = TRUE, character.only = TRUE)
+        )
     }
 
-    return(invisible(!check_attached(bare_pkgs)))  # Invert so that TRUE = detached.
+    result <- !check_attached(pkgs_chosen)
+    
+    if ((quiet == FALSE) & (sum(result) < length(result))) { # There are FALSEs in the vector.
+        message("Some packages were not detached because other packages still need them:\n  ",
+                paste(names(result[result == FALSE]), collapse = "  "),
+                "\n  To force them to detach, use the 'safe = FALSE' argument.")
+    }
+    
+    return(invisible(result))  # Invert so that TRUE = detached.
 }
+
+
 
 #' Detach and then reattach packages to the search path
 #'
@@ -164,7 +206,7 @@ unshelf <- function(..., everything = FALSE) {
 #' 
 #' @md
 reshelf <- function(...) {
-    unshelf(...)
+    unshelf(..., safe = FALSE, warn = FALSE)
     attached_status <- shelf(...)
     
     return(invisible(attached_status))

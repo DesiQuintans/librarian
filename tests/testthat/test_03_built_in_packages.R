@@ -20,7 +20,8 @@ test_that("Try to shelf() datasets", {
 
 test_that("Try to unshelf() datasets", {
     skip_on_cran()
-    expect_equal(sum(unshelf(datasets)), 1)
+    # Has to be safe = FALSE or else R CMD CHECK is unhappy.
+    expect_equal(sum(unshelf(datasets, safe = FALSE)), 1)
 })
 
 test_that("Try to reshelf() datasets", {

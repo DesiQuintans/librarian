@@ -4,7 +4,8 @@
 \alias{unshelf}
 \title{Detach (unload) packages from the search path}
 \usage{
-unshelf(..., everything = FALSE)
+unshelf(..., everything = FALSE, also_depends = FALSE, safe = TRUE,
+  quiet = TRUE)
 }
 \arguments{
 \item{...}{(Names) Packages as bare names. For packages that come from GitHub, you can
@@ -14,6 +15,15 @@ name.}
 \item{everything}{(Logical) If this is \code{TRUE}, detach every non-default package
 including librarian. Any names in \code{...} are ignored. The default packages can
 be listed with \code{getOption("defaultPackages")}.}
+
+\item{also_depends}{(Logical) If this is \code{TRUE}, also detach the dependencies of the
+packages listed in \code{...}. This can be slow.}
+
+\item{safe}{(Logical) If this is \code{TRUE}, packages won't be detached if they are needed
+by other packages that are \strong{not} listed in \code{...}.}
+
+\item{quiet}{(Logical) If this is \code{FALSE}, show a message when packages can't be
+detached because they are still needed by other packages.}
 }
 \value{
 Invisibly returns a named logical vector, where the names are the packages

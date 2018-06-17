@@ -13,5 +13,5 @@ test_that("Install fortunes (CRAN) and emptyRpackage (GitHub)", {
 
 test_that("Try to unshelf() fortunes and emptyRpackage", {
     skip_on_cran()
-    expect_equal(sum(unshelf(fortunes, DesiQuintans/emptyRpackage)), 2)
+    expect_equal(sum(unshelf(fortunes, DesiQuintans/emptyRpackage, safe = FALSE)), 2)
 })
