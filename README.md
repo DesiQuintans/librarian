@@ -89,18 +89,19 @@ The `quiet = TRUE` flag can suppress many of the messages that are routinely pri
 shelf(dplyr, DesiQuintans/desiderata, purrr, quiet = TRUE)
 ```
 
-`shelf` invisibly returns `devtools::session_info()`, so you can print it if you like.
+`shelf` invisibly returns a named vector of the packages that were requested and whether they are now attached.
 
 ``` r
-sesh <- shelf(janitor, DesiQuintans/desiderata, purrr)
-print(sesh)
+shelf(janitor, DesiQuintans/desiderata, purrr)
+print(.Last.value)
 
-
+#>   janitor      purrr desiderata 
+#>      TRUE       TRUE       TRUE
 ```
 
 ### `unshelf`
 
-When detaching GitHub packages with `unshelf()`, you can provide the package names only, or you can provide the full username/package identifier as you did with `shelf()`. 
+When detaching GitHub packages with `unshelf()`, you can provide the package names only, or you can provide the full username/package identifier as you did with `shelf()`.
 
 If you want to refresh a package by detaching and then reattaching it, use `reshelf()`.
 
@@ -111,9 +112,19 @@ unshelf(janitor, desiderata, purrr)
 unshelf(janitor, DesiQuintans/desiderata, purrr)
 ```
 
+You can use the `everything = TRUE` argument to detach all packages except for the default ones that load when R starts up. `unshelf()` invisibly returns a named vector of the packages that were requested and whether they are now detached.
+
+``` r
+unshelf(everything = TRUE)
+print(.Last.value)
+
+#> librarian testthat
+#> TRUE      TRUE
+```
+
 ### `reshelf`
 
-`reshelf()` detaches and then reattaches packages. This is useful when you have a personal package, because you'll often find yourself adding a function to it and rebuilding it in one instance of RStudio, and then reloading the new build in a different RStudio instance that contains your actual work. 
+`reshelf()` detaches and then reattaches packages. This is useful when you have a personal package, because you'll often find yourself adding a function to it and rebuilding it in one instance of RStudio, and then reloading the new build in a different RStudio instance that contains your actual work. Its return value is identical to `shelf()`.
 
 ``` r
 reshelf(DesiQuintans/desiderata)
