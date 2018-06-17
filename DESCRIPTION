@@ -13,6 +13,7 @@ License: GPL-3
 Encoding: UTF-8
 Imports:
     devtools (>= 1.13.0),
+    tools (>= 3.4.0),
     utils (>= 3.4.0)
 LazyData: true
 RoxygenNote: 6.0.1
