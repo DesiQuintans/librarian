@@ -1,3 +1,16 @@
+# librarian 1.2.0
+
+- MOD - Improved the documentation following CRAN feedback.
+- ADD - `shelf()`, `unshelf()`, and `reshelf()` now invisibly return named vectors describing the packages that were operated on and whether they were successfully attached or detached.
+- ADD - Unit tests to make sure that my fixes don't break stuff.
+- ADD - `unshelf(everything = TRUE)` argument detaches all packages except for the default ones.
+- ADD - `unshelf(safe = TRUE)` argument checks if packages are still needed by others before detaching them.
+- ADD - `unshelf(warn = TRUE)` argument will print a Message if packages were not detached (because `safe = TRUE` and the packages were still needed).
+- ADD - `unshelf(..., also_depends = TRUE)` argument detaches packages named in `...` as well as their dependencies.
+    - With the `safe` and `quiet` arguments defaulting to `TRUE`, the default behaviour is to leave packages behind if other packages in the search path still need them, but not to interrupt the user with a message about it. `unshelf()` still invisibly returns the success/failure for each package it attempted to detached.
+    - Looking through the search path with is pretty slow, I don't recommend it for sessions with lots of packages!
+- MOD - The new dependency-checking code needs the `tools` package, but it's distributed with R.
+
 # librarian 1.1.0
 
 - ADD - `reshelf()` for refreshing a package. Useful for loading new builds of your personal package.
