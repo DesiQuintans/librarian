@@ -44,6 +44,25 @@ librarian::unshelf(...)
 librarian::reshelf(...)
 ```
 
+## Selecting a library location
+
+If you want to define a custom location for your library:
+
+``` r
+.libPaths("Path/to/library/folder")
+```
+
+You can apply this to every R session by adding it to the `.First()` function in your site profile (`R\R-3.x.x\etc\Rprofile.site`):
+
+``` r
+.First <- function(){
+    .libPaths("Path/to/library/folder")
+}
+```
+You can do this without needing administrator rights, which is very handy.
+
+If you edit the site profile for every version of R you have installed, you can install a package once and then access it in all of your R versions (assuming the R version meets the packages' requirements, of course). I have my library on Dropbox so that I can use them at home, at work, and on my laptop and always know that it's the same version.
+
 ## Project participants
 
 -   Desi Quintans (<https://twitter.com/eco_desi>)
