@@ -29,8 +29,20 @@
 #' @md
 shelf <- function(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE) {
     # custom_repo = FALSE instead of NULL because NULL signals installation from local files.
-    if (custom_repo == FALSE) {  
-        custom_repo <- getOption("repos")
+    if (custom_repo == FALSE) {
+        cran_repo <- getOption("repos")
+        
+        # Automated testing fails with devtools::check() (but succeeds with
+        # devtools::test() heh) if the repo arg for install.packages is not set properly.
+        # After much weeping and gnashing of teeth from trying to work out what check()
+        # actually sees when it accesses getOption("repos"), I have found that testing
+        # whether getOption("repos") returns a URL works to catch whatever it is.
+        
+        # This regex matches all CRAN mirrors at https://cran.r-project.org/mirrors.html
+        if (grepl("^.*?\\.?[\\w\\d\\-\\.]+\\..*?$", paste(cran_repo, collapse = "/")) == FALSE) {
+            # Default to the official CRAN site because it's future-proof.
+            cran_repo <- "https://cran.r-project.org"
+        }
     }
     
     # 1. Get dots (which contains all the packages I want)
@@ -54,7 +66,7 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE) {
     }
 
     if (length(cran_missing) > 0) {
-        utils::install.packages(cran_missing, quiet = quiet, repos = custom_repo)
+        utils::install.packages(cran_missing, quiet = quiet, repos = cran_repo)
     }
     
     if (length(github_missing) > 0) {
@@ -69,7 +81,7 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE) {
         lapply(not_attached, library, character.only = TRUE, quietly = quiet)
     }
     
-    return(invisible(check_attached(all_pkgs)))
+    return(invisible(check_attached(nse_dots(..., keep_user = FALSE))))
 }
 
 
@@ -126,7 +138,7 @@ unshelf <- function(..., everything = FALSE) {
         lapply(to_detach_prefixed, detach, unload = TRUE, character.only = TRUE)
     }
 
-    return(invisible(!check_attached(to_detach)))  # Invert so that TRUE = detached.
+    return(invisible(!check_attached(bare_pkgs)))  # Invert so that TRUE = detached.
 }
 
 #' Detach and then reattach packages to the search path

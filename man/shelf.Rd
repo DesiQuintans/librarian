@@ -2,7 +2,7 @@
 % Please edit documentation in R/package_tools.R
 \name{shelf}
 \alias{shelf}
-\title{Attach packages to the library, installing them from CRAN/GitHub if needed}
+\title{Attach packages to the search path, installing them from CRAN or GitHub if needed}
 \usage{
 shelf(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE)
 }
@@ -11,7 +11,7 @@ shelf(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE)
 include both the username and package name as UserName/package (see examples).}
 
 \item{update_all}{(Logical) If \code{TRUE}, the packages will be re-installed even if they
-already exist in your computer.}
+are already in your library.}
 
 \item{quiet}{(Logical) Suppresses most warnings and messages.}
 
@@ -20,13 +20,21 @@ RStudio you can set a default mirror via \emph{Options > Packages > Default CRAN
 Otherwise, provide the URL to a CRAN mirror (e.g. "https://cran.csiro.au/").}
 }
 \value{
-Invisibly returns \code{devtools::session_info()}, which provides version info about
-your R and package installations.
+Invisibly returns a named logical vector, where the names are the packages
+requested in \code{...} and \code{TRUE} means that the package was successfully installed
+and attached.
 }
 \description{
-Attach packages to the library, installing them from CRAN/GitHub if needed
+Attach packages to the search path, installing them from CRAN or GitHub if needed
 }
 \examples{
 # shelf(janitor, DesiQuintans/desiderata, purrr)
+
+# shelf() returns invisibly; bind its output to a variable or access the .Last.value.
+
+# print(.Last.value)
+
+#> janitor desiderata      purrr 
+#>    TRUE       TRUE       TRUE 
 
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/package_tools.R
 \name{reshelf}
 \alias{reshelf}
-\title{Detach and then reattach packages}
+\title{Detach and then reattach packages to the search path}
 \usage{
 reshelf(...)
 }
@@ -12,12 +12,21 @@ keep the username/package format, or omit the username and provide just the pack
 name.}
 }
 \value{
-Returns \code{NULL} invisibly.
+Invisibly returns a named logical vector, where the names are the packages
+requested in \code{...} and \code{TRUE} means that the package was successfully attached.
 }
 \description{
-Detach and then reattach packages
+Detach and then reattach packages to the search path
 }
 \examples{
 # reshelf(desiderata)
+
+# reshelf() returns invisibly; bind its output to a variable or access the .Last.value.
+
+# print(.Last.value)
+
+#> desiderata 
+#>       TRUE
+
 
 }

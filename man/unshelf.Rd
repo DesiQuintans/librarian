@@ -2,20 +2,25 @@
 % Please edit documentation in R/package_tools.R
 \name{unshelf}
 \alias{unshelf}
-\title{Detach (unload) packages from the library}
+\title{Detach (unload) packages from the search path}
 \usage{
-unshelf(...)
+unshelf(..., everything = FALSE)
 }
 \arguments{
 \item{...}{(Names) Packages as bare names. For packages that come from GitHub, you can
 keep the username/package format, or omit the username and provide just the package
 name.}
+
+\item{everything}{(Logical) If this is \code{TRUE}, detach every non-default package
+including librarian. Any names in \code{...} are ignored. The default packages can
+be listed with \code{getOption("defaultPackages")}.}
 }
 \value{
-Returns \code{NULL} invisibly.
+Invisibly returns a named logical vector, where the names are the packages
+and \code{TRUE} means that the package was successfully detached.
 }
 \description{
-Detach (unload) packages from the library
+Detach (unload) packages from the search path
 }
 \examples{
 # These are the same:
@@ -23,9 +28,17 @@ Detach (unload) packages from the library
 # unshelf(janitor, desiderata, purrr)
 # unshelf(janitor, DesiQuintans/desiderata, purrr)
 
-# You can quickly unload-reload packages by just changing 'shelf' to 'unshelf'.
+# unshelf() returns invisibly; bind its output to a variable or access the .Last.value.
 
-#   shelf(janitor, DesiQuintans/desiderata, purrr)
-# unshelf(janitor, DesiQuintans/desiderata, purrr)
+# print(.Last.value)
+
+#> janitor desiderata      purrr 
+#>    TRUE       TRUE       TRUE 
+
+# unshelf(everything = TRUE)
+# print(.Last.value)
+
+#> librarian testthat
+#> TRUE      TRUE
 
 }
