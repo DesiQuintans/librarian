@@ -1,4 +1,4 @@
-context("Non-standard evaluation")
+context("Non-standard evaluation (HEY: Tests should be run from a new R session.)")
 
 library(librarian)
 

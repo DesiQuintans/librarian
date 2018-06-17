@@ -2,36 +2,28 @@ context("Attaching, detaching, and reattaching built-in packages")
 
 library(librarian)
 
-test_that("Start with built-in packages (boot, mgcv) unattached", {
+# 'datasets' package is used because trying to use a non-default built-in package (boot,
+# mgcv) in R CMD CHECK returns an error about those packages not existing. Seems like R
+# CMD CHECK doesn't actually have a library. So that's why I use a package that I know is
+# already loaded at startup.
+
+test_that("'datasets' is attached by default, so unattach it.", {
     skip_on_cran()
-    expect_error(detach("package:mgcv", unload = TRUE, character.only = TRUE), "invalid 'name' argument")
-    expect_error(detach("package:boot", unload = TRUE, character.only = TRUE), "invalid 'name' argument")
-    expect_equal(sum(check_attached(nse_dots(mgcv, boot))), 0)
+    expect_null(detach("package:datasets", unload = TRUE, character.only = TRUE))
+    expect_equal(sum(check_attached(nse_dots(datasets))), 0)
 })
 
-test_that("Try to shelf() boot and mgcv", {
+test_that("Try to shelf() datasets", {
     skip_on_cran()
-    expect_equal(sum(shelf(boot, mgcv, boot)), 2)
-    expect_equal(sum(check_attached(nse_dots(mgcv, boot, mgcv))), 2)
+    expect_equal(sum(shelf(datasets)), 1)
 })
 
-test_that("Try to unshelf() boot and mgcv", {
+test_that("Try to unshelf() datasets", {
     skip_on_cran()
-    expect_equal(sum(unshelf(boot, mgcv, mgcv)), 2)
-    expect_equal(sum(check_attached(nse_dots(boot, mgcv))), 0)
+    expect_equal(sum(unshelf(datasets)), 1)
 })
 
-test_that("Try to reshelf() boot and mgcv", {
+test_that("Try to reshelf() datasets", {
     skip_on_cran()
-    expect_equal(sum(reshelf(boot, boot, boot, mgcv)), 2)
-    expect_equal(sum(check_attached(nse_dots(boot, mgcv))), 2)
+    expect_equal(sum(reshelf(datasets)), 1)
 })
-
-test_that("Unshelf() to clean the environment", {
-    skip_on_cran()
-    expect_equal(sum(unshelf(boot, mgcv, mgcv)), 2)
-    expect_equal(sum(check_attached(nse_dots(boot, mgcv))), 0)
-})
-
-# Note that I can't automate testing for unshelf(everything = TRUE) because, of course, it
-# detaches every non-base package including testthat.
