@@ -1,6 +1,6 @@
 Package: librarian
 Title: Install, Update, Load Packages from CRAN and 'GitHub' in One Step
-Version: 1.1.0
+Version: 1.2.0
 Authors@R: person("Desi", "Quintans", email = "science@desiquintans.com",
                   role = c("aut", "cre"))
 Description: Automatically install, update, and load 'CRAN' and 'GitHub' packages in a single
@@ -16,3 +16,4 @@ Imports:
     utils (>= 3.4.0)
 LazyData: true
 RoxygenNote: 6.0.1
+Suggests: testthat
