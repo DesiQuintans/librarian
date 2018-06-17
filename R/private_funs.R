@@ -20,16 +20,16 @@ nse_dots <- function(..., keep_user = FALSE) {
 # If packages is empty, return a list of installed packages.
 # If packages is not empty (has package names), return a named logical vector showing if the 
 #             packages are installed or not.
-check_installed <- function(packages) {
+check_installed <- function(packages = NULL) {
     installed_pkgs <- rownames(utils::installed.packages())
     
-    if (length(packages) > 0) {
+    if (is.null(packages)) {
+        return(installed_pkgs)
+    } else {
         status <- packages %in% installed_pkgs
         names(status) <- packages
         
         return(status)
-    } else {
-        return(installed_pkgs)
     }
 }
 
@@ -38,15 +38,15 @@ check_installed <- function(packages) {
 # If packages is empty, return a list of currently-attached packages.
 # If packages is not empty (has package names), return a named logical vector showing if the 
 #             packages are attached or not.
-check_attached <- function(packages) {
+check_attached <- function(packages = NULL) {
     attached <- (.packages())
     
-    if (length(packages) > 0) {
+    if (is.null(packages)) {
+        return(attached)
+    } else {
         status <- packages %in% attached
         names(status) <- packages
         
         return(status)
-    } else {
-        return(attached)
     }
 }
