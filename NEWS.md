@@ -1,5 +1,8 @@
 # librarian 1.2.0
 
+- FIX - `shelf()` now sets a default CRAN repo properly on the command line.
+    - REM - The `custom_repo` argument in `shelf()` has been renamed to `cran_repo`.
+    - `cran_repo` arg checks that its value is a valid URL. I previously supported `custom_repo = NULL` because the base `install.packages()` uses `NULL` to signal installation from a local file, but the point of _librarian_ is to install CRAN and GitHub packages from the net, so `cran_repo` does not keep this functionality.
 - MOD - Improved the documentation following CRAN feedback.
 - ADD - `shelf()`, `unshelf()`, and `reshelf()` now invisibly return named vectors describing the packages that were operated on and whether they were successfully attached or detached.
 - ADD - Unit tests to make sure that my fixes don't break stuff.
@@ -8,7 +11,7 @@
 - ADD - `unshelf(warn = TRUE)` argument will print a Message if packages were not detached (because `safe = TRUE` and the packages were still needed).
 - ADD - `unshelf(..., also_depends = TRUE)` argument detaches packages named in `...` as well as their dependencies.
     - With the `safe` and `quiet` arguments defaulting to `TRUE`, the default behaviour is to leave packages behind if other packages in the search path still need them, but not to interrupt the user with a message about it. `unshelf()` still invisibly returns the success/failure for each package it attempted to detached.
-    - Looking through the search path with is pretty slow, I don't recommend it for sessions with lots of packages!
+    - Looking through the search path is pretty slow, I don't recommend it for sessions with lots of packages!
 - MOD - The new dependency-checking code needs the `tools` package, but it's distributed with R.
 
 # librarian 1.1.0
