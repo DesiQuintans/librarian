@@ -50,3 +50,10 @@ check_attached <- function(packages = NULL) {
         return(status)
     }
 }
+
+# Runs with devtools::release().
+release_questions <- function() {
+    c(
+        "Have you run devtools::test()?"
+    )
+}
