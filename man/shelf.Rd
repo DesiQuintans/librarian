@@ -4,7 +4,8 @@
 \alias{shelf}
 \title{Attach packages to the search path, installing them from CRAN or GitHub if needed}
 \usage{
-shelf(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE)
+shelf(..., update_all = FALSE, quiet = FALSE,
+  cran_repo = getOption("repos"))
 }
 \arguments{
 \item{...}{(Names) Packages as bare names. If the package is from GitHub,
@@ -15,9 +16,9 @@ are already in your library.}
 
 \item{quiet}{(Logical) Suppresses most warnings and messages.}
 
-\item{custom_repo}{(\code{FALSE} or Character) Use \code{FALSE} for the default mirror (in
-RStudio you can set a default mirror via \emph{Options > Packages > Default CRAN Mirror}).
-Otherwise, provide the URL to a CRAN mirror (e.g. "https://cran.csiro.au/").}
+\item{cran_repo}{(Character) In RStudio, a default CRAN repo can be set via
+\emph{Options > Packages > Default CRAN Mirror}). Otherwise, provide the URL to CRAN or
+one of its mirrors (e.g. "https://cran.r-project.org").}
 }
 \value{
 Invisibly returns a named logical vector, where the names are the packages
