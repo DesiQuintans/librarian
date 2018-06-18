@@ -1,24 +1,25 @@
 ## Resubmission
 
-This is a resubmission. I have:
+This is a resubmission. I have made these changes based on your feedback:
 
-    - Put the code for examples in comments so that running the examples would not 
-      install packages unless the user explicitly removed the # tag.
+    - Improved terminology (packages, search paths, libraries, etc.)
+    - Functions return a vector of success/failure for each package that was operated on.
+    - Readme teaches the user how to specify a library location.
+    - User can now set a CRAN mirror.
+
 
 ## Test environments
 
 - win-builder R-devel
-- Local Windows 7 64-bit install, R-devel (2018-05-23 r74775)
+- win-builder R-current (3.5.0)
 - Local Windows 7 64-bit install, R 3.5.0
-- Local Windows 7 64-bit install, R 3.4.2
 
 
 ## R CMD check results
 
-There were no ERRORs or WARNINGs or NOTEs for the 3 local R versions that I tested, 
-including R-devel.
+There were no ERRORs or WARNINGs or NOTEs for the local R version that I tested.
 
-win-builder produced no ERRORs or WARNINGs.
+win-builder (R-devel and R 3.5.0) produced no ERRORs or WARNINGs.
 
 win-builder produced 1 NOTE ("checking CRAN incoming feasibility").
 
