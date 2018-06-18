@@ -87,11 +87,17 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 
 `shelf()` attaches packages to the search path, first installing them from CRAN or GitHub if needed.
 
-For CRAN packages, provide the package name as normal.  
+For CRAN packages, provide the package name as normal.
 For GitHub packages, provide the username and package name separated by `/`.
 
 ``` r
 shelf(dplyr, DesiQuintans/desiderata, purrr)
+```
+
+You can download from a specific CRAN mirror by setting `cran_repo`. The default value of `cran_repo` is the value set in `getOption("repos")`. You can set this in RStudio using _Options > Packages > Default CRAN Mirror_. If you are not in RStudio this option may not be correctly set. In all cases where `cran_repo` is not a valid URL, it defaults to `https://cran.r-project.org`.
+
+``` r
+shelf(dplyr, cran_repo = "https://cran.csiro.au/")
 ```
 
 To force all of the named packages to re-download and re-install, use `update_all = TRUE`. 
@@ -120,7 +126,9 @@ print(.Last.value)
 
 ### `unshelf`
 
-When detaching GitHub packages with `unshelf()`, you can provide the package names only, or you can provide the full username/package identifier as you did with `shelf()`.
+When detaching GitHub packages with `unshelf()`, you can provide the package names only, or you can provide the full username/package identifier as you did with `shelf()`. 
+
+`unshelf()` invisibly returns a named vector of the packages that were requested and whether they are now detached.
 
 If you want to refresh a package by detaching and then reattaching it, use `reshelf()`.
 
@@ -131,7 +139,7 @@ unshelf(janitor, desiderata, purrr)
 unshelf(janitor, DesiQuintans/desiderata, purrr)
 ```
 
-You can use the `everything = TRUE` argument to detach all packages except for the default ones that load when R starts up. `unshelf()` invisibly returns a named vector of the packages that were requested and whether they are now detached.
+You can use the `everything = TRUE` argument to detach all packages except for the default ones that load when R starts up. 
 
 ``` r
 unshelf(everything = TRUE)
@@ -140,6 +148,42 @@ print(.Last.value)
 #> librarian testthat
 #> TRUE      TRUE
 ```
+
+The `also_depends = TRUE` argument will also detach the dependencies of the packages you've requested in `...`. If `safe = TRUE`, packages won't be detached if they're still needed by other packages that aren't in `...`.
+
+``` r
+shelf(tidyverse, janitor)  
+
+librarian:::check_attached()
+
+#> [1] "janitor"   "forcats"   "stringr"   "dplyr"     "purrr"     "readr"     "tidyr"     "tibble"   
+#> [9] "ggplot2"   "tidyverse" "librarian" "stats"     "graphics"  "grDevices" "utils"     "datasets" 
+#> [17] "methods"   "base"     
+
+# Tidyverse loads dplyr and purrr, which Janitor depends on. The safe = TRUE argument 
+# will stop them from being detached even though Tidyverse is being detached 
+# with also_depends = TRUE.
+
+unshelf(tidyverse, also_depends = TRUE, safe = TRUE, quiet = FALSE)
+
+#> Some packages were not detached because other packages still need them:
+#>     dplyr  purrr  tidyr
+#> To force them to detach, use the 'safe = FALSE' argument.
+
+librarian:::check_attached()
+
+#> [1] "janitor"   "dplyr"     "purrr"     "tidyr"     "librarian" "stats"     "graphics"  "grDevices"
+#> [9] "utils"     "datasets"  "methods"   "base"     
+
+unshelf(tidyverse, also_depends = TRUE, safe = FALSE, quiet = FALSE)
+
+librarian:::check_attached()
+
+#> [1] "janitor"   "librarian" "stats"     "graphics"  "grDevices" "utils"     "datasets"  "methods"  
+#> [9] "base"
+```
+
+In the example above, setting `quiet = TRUE` will suppress the "some packages were not detached" message.
 
 ### `reshelf`
 
@@ -150,6 +194,6 @@ reshelf(DesiQuintans/desiderata)
 
 # is identical to
 
-unshelf(DesiQuintans/desiderata)
+unshelf(DesiQuintans/desiderata, safe = FALSE, warn = FALSE))
   shelf(DesiQuintans/desiderata)
 ```
