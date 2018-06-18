@@ -7,9 +7,9 @@
 #' @param update_all (Logical) If `TRUE`, the packages will be re-installed even if they
 #'    are already in your library.
 #' @param quiet (Logical) Suppresses most warnings and messages.
-#' @param custom_repo (`FALSE` or Character) Use `FALSE` for the default mirror (in 
-#'    RStudio you can set a default mirror via _Options > Packages > Default CRAN Mirror_). 
-#'    Otherwise, provide the URL to a CRAN mirror (e.g. "https://cran.csiro.au/").
+#' @param cran_repo (Character) In RStudio, a default CRAN repo can be set via 
+#'    _Options > Packages > Default CRAN Mirror_). Otherwise, provide the URL to CRAN or 
+#'    one of its mirrors (e.g. "https://cran.r-project.org").
 #'
 #' @return Invisibly returns a named logical vector, where the names are the packages 
 #'    requested in `...` and `TRUE` means that the package was successfully installed 
@@ -27,21 +27,25 @@
 #' #>    TRUE       TRUE       TRUE 
 #' 
 #' @md
-shelf <- function(..., update_all = FALSE, quiet = FALSE, custom_repo = FALSE) {
-    # custom_repo = FALSE instead of NULL because NULL signals installation from local files.
-    if (custom_repo == FALSE) {
-        cran_repo <- getOption("repos")
+shelf <- function(..., update_all = FALSE, quiet = FALSE, cran_repo = getOption("repos")) {
+    # cran_repo needs to be validated. 
+    # Automated testing fails with devtools::check() (but passes with devtools::test()) if
+    # the repo arg for install.packages() is not set properly. If I run getOption("repos")
+    # in R.exe running in the shell, I get the named vector c("CRAN" = "@CRAN@"), which is
+    # probably what was causing the error. To catch this, I'll test whether cran_repo is 
+    # a URL. It turns out that validating URLs properly can be very complicated ()
+    
+    # Regex is "@stephenhay" from https://mathiasbynens.be/demo/url-regex because it's the 
+    # shortest regex that matches every CRAN mirror at https://cran.r-project.org/mirrors.html
+    cran_repo_is_url <- grepl("(https?|ftp)://[^\\s/$.?#].[^\\s]*", cran_repo)
+    
+    if (cran_repo_is_url == FALSE) {
+        # Default to the official CRAN site because it's future-proof.
+        cran_repo <- "https://cran.r-project.org"
         
-        # Automated testing fails with devtools::check() (but succeeds with
-        # devtools::test() heh) if the repo arg for install.packages is not set properly.
-        # After much weeping and gnashing of teeth from trying to work out what check()
-        # actually sees when it accesses getOption("repos"), I have found that testing
-        # whether getOption("repos") returns a URL works to catch whatever it is.
-        
-        # This regex matches all CRAN mirrors at https://cran.r-project.org/mirrors.html
-        if (grepl("^.*?\\.?[\\w\\d\\-\\.]+\\..*?$", paste(cran_repo, collapse = "/")) == FALSE) {
-            # Default to the official CRAN site because it's future-proof.
-            cran_repo <- "https://cran.r-project.org"
+        if (quiet == FALSE) {
+            warning("cran_repo = '", as.character(cran_repo), "' is not a valid URL. 
+                    Defaulting to cran_repo = 'https://cran.r-project.org'.")
         }
     }
     
