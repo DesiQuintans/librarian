@@ -40,13 +40,13 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, cran_repo = getOption(
     cran_repo_is_url <- grepl("(https?|ftp)://[^\\s/$.?#].[^\\s]*", cran_repo)
     
     if (cran_repo_is_url == FALSE) {
-        # Default to the official CRAN site because it's future-proof.
-        cran_repo <- "https://cran.r-project.org"
-        
         if (quiet == FALSE) {
             warning("cran_repo = '", as.character(cran_repo), "' is not a valid URL. 
                     Defaulting to cran_repo = 'https://cran.r-project.org'.")
         }
+        
+        # Default to the official CRAN site because it's future-proof.
+        cran_repo <- "https://cran.r-project.org"
     }
     
     # 1. Get dots (which contains all the packages I want)

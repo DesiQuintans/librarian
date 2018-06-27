@@ -1,3 +1,7 @@
+# librarian 1.3.0
+
+- FIX - The `cran_repo` replacement warning raised by `shelf()` now shows the string that was changed.
+
 # librarian 1.2.0
 
 - FIX - `shelf()` now sets a default CRAN repo properly on the command line.
