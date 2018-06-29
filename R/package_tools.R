@@ -1,5 +1,6 @@
 # Package management
 
+
 #' Attach packages to the search path, installing them from CRAN or GitHub if needed
 #'
 #' @param ... (Names) Packages as bare names. If the package is from GitHub,
@@ -17,6 +18,7 @@
 #' @export
 #'
 #' @examples
+#' 
 #' # shelf(janitor, DesiQuintans/desiderata, purrr)
 #' 
 #' # shelf() returns invisibly; bind its output to a variable or access the .Last.value.
@@ -28,12 +30,11 @@
 #' 
 #' @md
 shelf <- function(..., update_all = FALSE, quiet = FALSE, cran_repo = getOption("repos")) {
-    # cran_repo needs to be validated. 
     # Automated testing fails with devtools::check() (but passes with devtools::test()) if
     # the repo arg for install.packages() is not set properly. If I run getOption("repos")
     # in R.exe running in the shell, I get the named vector c("CRAN" = "@CRAN@"), which is
     # probably what was causing the error. To catch this, I'll test whether cran_repo is 
-    # a URL. It turns out that validating URLs properly can be very complicated ()
+    # a URL.
     
     # Regex is "@stephenhay" from https://mathiasbynens.be/demo/url-regex because it's the 
     # shortest regex that matches every CRAN mirror at https://cran.r-project.org/mirrors.html
@@ -154,7 +155,7 @@ unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, 
         
         to_detach <- pkgs_chosen[which(pkgs_chosen %in% attached)]
 
-        # If chosen, don't detach packages that other still-attached packages need.
+        # If safe, don't detach packages that other still-attached packages need.
         if (safe == TRUE) {
             # Get the dependency list of the attached packages NOT named in ...
             pkgs_remaining <- attached[which(!attached %in% pkgs_chosen)]
@@ -214,4 +215,103 @@ reshelf <- function(...) {
     attached_status <- shelf(...)
     
     return(invisible(attached_status))
+}
+
+
+
+
+#' Changing and viewing the package search paths
+#' 
+#' Can add an existing folder to the library trees (the list of folders that R will 
+#' look inside when trying to find a package), or create a completely new folder and then 
+#' add it, or shuffle a folder to the front of the list so that it is used as the default 
+#' installation location for new packages in the current session.
+#'
+#' @param path (Character, or omit) A path to add to the library search path. Can be an 
+#'     absolute or relative path. If `path` has more than one element, only the first 
+#'     one will be kept. Tilde expansion is performed on the input, but wildcard expansion 
+#'     (globbing) is not. If `path` is omitted, return the current library search path.
+#' @param make_path (Logical) If `TRUE`, create `path`'s directory structure if it doesn't 
+#'     exist.
+#' @param ask (Logical) If `TRUE`, ask before creating `path`'s directory structure if 
+#'     `make_path = TRUE`. Ignored if `make_path = FALSE`.
+#'
+#' @return A character vector of the folders on the library search path. If `path` was not 
+#'     omitted, it will be the first element.
+#' @export
+#'
+#' @examples
+#' \donttest{
+#' lib_paths()
+#' #> [1] "D:/R/R-3.5.0/library"
+#' 
+#' lib_paths(file.path(tempdir(), "newlibraryfolder"), ask = FALSE)
+#' #> [1] "C:/Users/.../Temp/Rtmp0Qbvgo/newlibraryfolder"
+#' #> [2] "D:/R/R-3.5.0/library"
+#' }
+#' 
+#' @md
+lib_paths <- function(path, make_path = TRUE, ask = TRUE) {
+    if (missing(path)) {
+        return(.libPaths())
+    }
+    
+    if (is.null(path) || is.na(path) || nchar(path) == 0) {
+        # Standard behaviour for install.packages() and install_github() is to use the 
+        # first element in .libPaths().
+        path <- .libPaths()[1]
+    }
+    
+    # Consistent with the behaviour above, keep only the first element of 'folder' in case
+    # it has more than one. 
+    
+    # Tilde expansion is done just like .libPaths(), except I use normalizePath() 
+    # instead of path.expand() so that 'folder' is an absolute path.
+    
+    # Unlike .libPaths(), wildcard expansion (globbing) is NOT done because it fails when
+    # the user offers a library folder that doesn't exist yet (presumably so it can be
+    # created by this very function).
+    path <- normalizePath(path[1], winslash = "/", mustWork = FALSE)
+    
+    if (dir.exists(path) == FALSE) {
+        if (make_path == FALSE) {
+            stop("The path '", 
+                 normalizePath(path, winslash = "\\", mustWork = FALSE),
+                 "' does not exist. To create it, set the argument make_path = TRUE.")
+        }
+        
+        if (ask == TRUE && interactive() == FALSE) {
+            # The user can't be prompted, so do nothing rather than create folders unattended.
+            stop("The library path will not be created because the user can't be prompted
+                 while R is running non-interactively. To create the folder without 
+                 prompting, set the argument ask = FALSE.")
+        }
+        
+        if (ask == TRUE) {
+            ans <- utils::askYesNo(paste0("The requested library folder does not exist:\n\n", 
+                                   normalizePath(path, winslash = "\\", mustWork = FALSE),
+                                   "\n\nCreate it?"), 
+                            default = FALSE)
+            
+            if (ans == FALSE || is.na(ans)) {
+                stop("The path '", 
+                     normalizePath(path, winslash = "\\", mustWork = FALSE), 
+                     "' does not exist and was not created.")
+            }
+        }
+        
+        # make_folder = TRUE --- user said yes --- ask = FALSE
+        # Build the whole dir structure leading to 'folder' and return an absolute path to it.
+        path <- make_dirs(path)  
+    }
+    
+    if (file.access(path, 2) < 0) {  # -1 indicates dir not writeable
+        stop("The path '", path, "' is not writeable.")
+    }
+    
+    # There is no need to check whether 'folder' already appears in .libPaths(); it will
+    # not be duplicated when it's prepended.
+    .libPaths(c(path, .libPaths()))
+    
+    return(.libPaths())
 }
