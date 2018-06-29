@@ -1,7 +1,20 @@
 # Internal functions for librarian.
 
-# Non-standard evaluation of dots with base R so that I don't need to import Rlang.
-# If keep_user = FALSE, remove the Username/ component from GitHub "Username/Packagename".
+
+#' Non-standard evaluation of dots with base R
+#'
+#' @param ... (Dots) A dots list.
+#' @param keep_user (Logical) If `FALSE`, remove the Username/ component from GitHub 
+#'     "Username/Packagename".
+#'
+#' @return The dots list as a character vector.
+#'
+#' @examples
+#' nse_dots(package, names, here)
+#' 
+#' #> [1] "package" "names"   "here"   
+#' 
+#' @md
 nse_dots <- function(..., keep_user = FALSE) {
     dots <- eval(substitute(alist(...)))
     dots <- as.character(dots)
@@ -16,10 +29,25 @@ nse_dots <- function(..., keep_user = FALSE) {
 }
 
 
-# Check installed packages. 
-# If packages is empty, return a list of installed packages.
-# If packages is not empty (has package names), return a named logical vector showing if the 
-#             packages are installed or not.
+#' Check installed packages
+#'
+#' @param packages (NULL or Character) 
+#'
+#' @return If `packages = NULL`, return a character vector of installed packages. If 
+#'     `packages` contains a character vector of package names, return a named logical 
+#'     vector showing if the packages are installed or not.
+#'
+#' @examples
+#' check_installed()
+#' 
+#' #>   [1] "addinslist"  "antiword" " ape"  "assertthat"  ...
+#' 
+#' check_installed(c("utils", "stats"))
+#' 
+#' #> utils stats 
+#' #> TRUE  TRUE 
+#' 
+#' @md
 check_installed <- function(packages = NULL) {
     installed_pkgs <- rownames(utils::installed.packages())
     
@@ -34,10 +62,25 @@ check_installed <- function(packages = NULL) {
 }
 
 
-# Check attached packages.
-# If packages is empty, return a list of currently-attached packages.
-# If packages is not empty (has package names), return a named logical vector showing if the 
-#             packages are attached or not.
+#' Check attached packages
+#'
+#' @param packages (NULL or Character)
+#'
+#' @return If `packages = NULL`, return a list of currently-attached packages. If 
+#'     `packages` contains a character vector of package names, return a named logical 
+#'     vector showing if the packages are attached or not.
+#'
+#' @examples
+#' check_attached()
+#' 
+#' #> [1] "stats"  "graphics"  "grDevices"  ...
+#' 
+#' check_attached(c("utils", "stats"))
+#' 
+#' #> utils stats 
+#' #> TRUE  TRUE 
+#' 
+#' @md
 check_attached <- function(packages = NULL) {
     attached <- (.packages())
     
@@ -50,6 +93,59 @@ check_attached <- function(packages = NULL) {
         return(status)
     }
 }
+
+#' Build a path, creating subfolders if needed
+#'
+#' Whereas `base::file.path()` only concatenates strings to build a path, `make_path()`
+#' *also* makes sure those folders exist.
+#'
+#' @param ... (Character) Arguments to send to `file.path()`. You can provide a complete
+#'    path as a single string, or incrementally build a path with many strings.
+#'
+#' @return (Character) A file path. Automatically adds trailing slashes if required.
+#'
+#' @examples
+#' # make_path("path", "to", "subfolder")
+#'
+#' #> [1] "path/to/subfolder"
+#' # And the path/to/subfolder/ folders were also created in the working directory.
+#'
+#' # saveRDS(iris, make_path("subfolders/to/compiled/data/iris.rds"))
+#'
+#' # Creates all of the subfolders required for writing iris.rds.
+#'
+#' @section Authors:
+#' - Desi Quintans (<http://www.desiquintans.com>)
+#'
+#' @section Source:
+#' - Desiderata package (<https://github.com/DesiQuintans/desiderata>)
+#'
+#' @md
+make_dirs <- function(...) {
+    path <- file.path(...)
+    
+    if (grepl("\\.", basename(path)) == TRUE) {
+        pathToBuild <- file.path(dirname(path), "/")
+        # The basename has a file extension, which means that it ends with a filename.
+        # Therefore dirname() is returning a folder path without the trailing slash.
+        # Add the trailing slash or else dir.create() will not create the last folder.
+    } else if (substr(path, nchar(path), nchar(path)) == "/") {
+        pathToBuild <- path
+        # The last character in the path is a slash, therefore this is a fully-qualified folder
+        # path. I can create it as-is.
+    } else {
+        pathToBuild <- file.path(path, "/")
+        # If path does not have a file extension and doesn't have a trailing slash, then it is
+        # a folder path with no trailing slash -- but we can't use the above code because
+        # dirname() cuts off the last folder in this case.
+    }
+    
+    if (!dir.exists(pathToBuild))
+        dir.create(pathToBuild, recursive = TRUE)
+    
+    return(normalizePath(path, winslash = "/"))
+}
+
 
 # Runs with devtools::release().
 release_questions <- function() {
