@@ -18,7 +18,7 @@ vector showing if the packages are installed or not.
 Check installed packages
 }
 \examples{
-\donttest{
+\dontrun{
 check_installed()
 
 #>   [1] "addinslist"  "antiword" " ape"  "assertthat"  ...

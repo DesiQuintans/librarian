@@ -32,7 +32,7 @@ Whereas \code{base::file.path()} only concatenates strings to build a path, \cod
 }
 
 \examples{
-\donttest{
+\dontrun{
 make_dirs(tempdir(), "newfolder")
 
 #> [1] "C:/Users/.../Temp/RtmpSwZA8X/newfolder"

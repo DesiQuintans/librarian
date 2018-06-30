@@ -20,14 +20,14 @@ Detach and then reattach packages to the search path
 }
 \examples{
 \donttest{
-reshelf(desiderata)
+reshelf(datasets)
 
 # reshelf() returns invisibly; bind its output to a variable or access the .Last.value.
 
 print(.Last.value)
 
-#> desiderata 
-#>       TRUE
+#> datasets 
+#>     TRUE
 }
 
 }

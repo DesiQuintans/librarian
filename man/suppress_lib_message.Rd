@@ -18,7 +18,7 @@ and remove.packages, which is caused by the 'lib' arg not being assigned in the
 function call. In particular, devtools::install_github() ultimately
 }
 \examples{
-\donttest{
+\dontrun{
 suppress_lib_message(remove.packages(fortunes))
 }
 }

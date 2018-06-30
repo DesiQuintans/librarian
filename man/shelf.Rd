@@ -51,7 +51,7 @@ already-installed package to reinstall, a new copy of that package will be made 
 \code{lib} and then loaded from there. This means that you can potentially have several
 copies of the same package across many folders on your machine, each a different
 version. This allows you to maintain a different library folder for different projects,
-so that updated packages in Project B wil not affect the package versions you rely on
+so that updated packages in Project B will not affect the package versions you rely on
 for Project A.
 }
 \examples{

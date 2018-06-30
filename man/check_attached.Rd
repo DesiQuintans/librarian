@@ -18,7 +18,7 @@ vector showing if the packages are attached or not.
 Check attached packages
 }
 \examples{
-\donttest{
+\dontrun{
 check_attached()
 
 #> [1] "stats"  "graphics"  "grDevices"  ...

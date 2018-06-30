@@ -10,7 +10,7 @@
 #' @return The dots list as a character vector.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' nse_dots(package, names, here)
 #' 
 #' #> [1] "package" "names"   "here"   
@@ -40,7 +40,7 @@ nse_dots <- function(..., keep_user = FALSE) {
 #'     vector showing if the packages are installed or not.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' check_installed()
 #' 
 #' #>   [1] "addinslist"  "antiword" " ape"  "assertthat"  ...
@@ -75,7 +75,7 @@ check_installed <- function(packages = NULL) {
 #'     vector showing if the packages are attached or not.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' check_attached()
 #' 
 #' #> [1] "stats"  "graphics"  "grDevices"  ...
@@ -111,7 +111,7 @@ check_attached <- function(packages = NULL) {
 #' @return (Character) A file path. Automatically adds trailing slashes if required.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' make_dirs(tempdir(), "newfolder")
 #'
 #' #> [1] "C:/Users/.../Temp/RtmpSwZA8X/newfolder"
@@ -162,7 +162,7 @@ make_dirs <- function(...) {
 #' @return Runs the expression, suppressing the "(as 'lib' is unspecified)" message only.
 #' 
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' suppress_lib_message(remove.packages(fortunes))
 #' }
 suppress_lib_message <- function(expr) {
