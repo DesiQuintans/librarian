@@ -329,9 +329,9 @@ lib_paths <- function(path, make_path = TRUE, ask = TRUE) {
         
         if (ask == TRUE && interactive() == FALSE) {
             # The user can't be prompted, so do nothing rather than create folders unattended.
-            stop("The library path will not be created because the user can't be prompted
-                 while R is running non-interactively. To create the folder without 
-                 prompting, set the argument ask = FALSE.")
+            stop("The library path will not be created because the user can't be prompted ",
+                 "while R is running non-interactively. To create the folder without ", 
+                 "prompting, set the argument ask = FALSE.")
         }
         
         if (ask == TRUE) {
