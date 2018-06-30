@@ -23,17 +23,19 @@ A character vector of the folders on the library search path. If \code{path} was
 omitted, it will be the first element.
 }
 \description{
-Can add an existing folder to the library trees (the list of folders that R will
-look inside when trying to find a package), or create a completely new folder and then
-add it, or shuffle a folder to the front of the list so that it is used as the default
-installation location for new packages in the current session.
+View and edit the list of folders that R will look inside when trying to find a
+package. Add an existing folder, create and add a new folder, or shuffle a folder to
+the front of the list so that it is used as the default installation location for new
+packages in the current session.
 }
 \examples{
 \donttest{
 lib_paths()
+
 #> [1] "D:/R/R-3.5.0/library"
 
 lib_paths(file.path(tempdir(), "newlibraryfolder"), ask = FALSE)
+
 #> [1] "C:/Users/.../Temp/Rtmp0Qbvgo/newlibraryfolder"
 #> [2] "D:/R/R-3.5.0/library"
 }

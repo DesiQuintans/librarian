@@ -11,7 +11,7 @@
 #'    created. Can be an absolute or relative path. Tilde expansion is performed on the 
 #'    input, but wildcard expansion (globbing) is not. If `lib` has more than one element, 
 #'    only the first one will be kept. Defaults to the current library search path. See 
-#'    'Working with multiple library folders' for more information.
+#'    the 'Details' section below for more information.
 #' @param update_all (Logical) If `TRUE`, the packages will be re-installed even if they
 #'    are already in your library.
 #' @param quiet (Logical) If `TRUE`, suppresses most warnings and messages.
@@ -19,23 +19,22 @@
 #'    before creating the folder. If `FALSE`, the folder will be created silently.
 #' @param cran_repo (Character) In RStudio, a default CRAN repo can be set via 
 #'    _Options > Packages > Default CRAN Mirror_). Otherwise, provide the URL to CRAN or 
-#'    one of its mirrors (e.g. "https://cran.r-project.org").
+#'    one of its mirrors. If an invalid URL is given, defaults to https://cran.r-project.org.
 #'
 #' @details  
 #' You may choose to organise your library into folders to hold packages for different 
-#' tasks or projects. You do this by specifying a `lib` folder to create it and attach it
-#' to the package search path. R will look for packages by working through the package 
-#' search path in order. You can view the folders that are on this path by 
+#' tasks or projects. If you specify a `lib` folder, it will be created (if needed) and 
+#' attached to the package search path. R will look for packages by working through the 
+#' package search path in order. You can view the folders that are on this path by 
 #' calling `lib_paths()` with no arguments.
 #' 
-#' **If `lib` is a new folder but the packages in `...` are already installed in a 
-#'    different folder that is listed in `lib_paths()`:** `lib` will be created but the 
-#'    packages will be loaded from their current install location.
-#'    
-#' **If `update_all = TRUE` but the packages in `...` are already installed as above:** 
-#'    The packages will be installed to `lib`, and you will have two copies of this 
-#'    package, potentially with different versions, installed to two different places. The 
-#'    version in `lib` is the one that is attached.
+#' If you specify a new `lib` and use the argument `update_all = TRUE` to force an 
+#' already-installed package to reinstall, a new copy of that package will be made in 
+#' `lib` and then loaded from there. This means that you can potentially have several 
+#' copies of the same package across many folders on your machine, each a different 
+#' version. This allows you to maintain a different library folder for different projects, 
+#' so that updated packages in Project B wil not affect the package versions you rely on 
+#' for Project A.
 #'
 #' @return Invisibly returns a named logical vector, where the names are the packages 
 #'    requested in `...` and `TRUE` means that the package was successfully installed 
@@ -44,11 +43,11 @@
 #'
 #' @examples
 #' \donttest{
-#' #shelf(fortunes, DesiQuintans/emptyRpackage, cowsay, lib = tempdir(), update_all = TRUE)
+#' shelf(fortunes, DesiQuintans/emptyRpackage, cowsay, lib = tempdir(), update_all = TRUE)
 #' 
 #' # shelf() returns invisibly; bind its output to a variable or access the .Last.value.
 #' 
-#' #print(.Last.value)
+#' print(.Last.value)
 #' 
 #' #> fortunes desiderata     cowsay 
 #' #>     TRUE       TRUE       TRUE
@@ -132,47 +131,56 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
 #' @param ... (Names) Packages as bare names. For packages that come from GitHub, you can
 #'    keep the username/package format, or omit the username and provide just the package 
 #'    name.
-#' @param everything (Logical) If this is `TRUE`, detach every non-default package 
-#'    including librarian. Any names in `...` are ignored. The default packages can 
-#'    be listed with `getOption("defaultPackages")`.
-#' @param also_depends (Logical) If this is `TRUE`, also detach the dependencies of the 
-#'    packages listed in `...`. This can be slow.
-#' @param safe (Logical) If this is `TRUE`, packages won't be detached if they are needed 
-#'    by other packages that are **not** listed in `...`.
-#' @param quiet (Logical) If this is `FALSE`, show a message when packages can't be 
-#'    detached because they are still needed by other packages.
+#' @param everything (Logical) If `TRUE`, detach every non-default package including
+#'    librarian. Any names in `...` are ignored. The default packages can be listed
+#'    with `getOption("defaultPackages")`.
+#' @param also_depends (Logical) If `TRUE`, also detach the dependencies of the packages
+#'    listed in `...`. This can be slow.
+#' @param safe (Logical) If `TRUE`, packages won't be detached if they are needed by other
+#'    packages that are **not** listed in `...`.
+#' @param quiet (Logical) If `FALSE`, show a message when packages can't be detached 
+#'    because they are still needed by other packages.
 #'    
 #' @return Invisibly returns a named logical vector, where the names are the packages 
 #'    and `TRUE` means that the package was successfully detached.
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # These are the same:
 #' 
-#' # unshelf(janitor, desiderata, purrr)
-#' # unshelf(janitor, DesiQuintans/desiderata, purrr)
+#' unshelf(janitor, desiderata, purrr)
+#' unshelf(janitor, DesiQuintans/desiderata, purrr)
 #' 
 #' # unshelf() returns invisibly; bind its output to a variable or access the .Last.value.
 #' 
-#' # print(.Last.value)
+#' print(.Last.value)
 #' 
-#' #> janitor desiderata      purrr 
-#' #>    TRUE       TRUE       TRUE 
+#' #> desiderata    janitor      purrr 
+#' #>       TRUE       TRUE       TRUE 
 #' 
-#' # unshelf(everything = TRUE)
-#' # print(.Last.value)
+#' unshelf(everything = TRUE)
+#' print(.Last.value)
 #' 
 #' #> librarian testthat
 #' #> TRUE      TRUE
+#' }
 #' 
 #' @md
 unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, quiet = TRUE) {
+    if (...length() == 0 && everything == FALSE) {
+        # Errors should not be 'quiet'-able.
+        stop("No packages were chosen for detaching. Either provide the names of ", 
+             "packages, or set 'everything = TRUE' to detach all non-Base packages.")
+    }
+    
     attached <- check_attached()
     
     if (everything == TRUE) {
         # Detach everything that isn't a base package.
         base_pkgs <- c(getOption("defaultPackages"), "base")  # Base is absent from the list
         to_detach <- attached[which(!attached %in% base_pkgs)]
+        pkgs_chosen <- to_detach  # HACK: Pretend that the user named all of these non-Base packages.
     } else {
         # Detach only the packages that are requested.
         pkgs_chosen <- nse_dots(..., keep_user = FALSE)
@@ -211,15 +219,15 @@ unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, 
         )
     }
 
-    result <- !check_attached(pkgs_chosen)
+    result <- !check_attached(sort(unique(c(pkgs_chosen, to_detach))))  # Invert so that TRUE means 'detached'.
     
-    if ((quiet == FALSE) & (sum(result) < length(result))) { # There are FALSEs in the vector.
+    if ((quiet == FALSE) & (sum(result) < length(result))) { # If result has FALSEs.
         message("Some packages were not detached because other packages still need them:\n  ",
                 paste(names(result[result == FALSE]), collapse = "  "),
                 "\n  To force them to detach, use the 'safe = FALSE' argument.")
     }
     
-    return(invisible(result))  # Invert so that TRUE = detached.
+    return(invisible(result))  
 }
 
 
@@ -235,15 +243,16 @@ unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, 
 #' @export
 #'
 #' @examples
-#' # reshelf(desiderata)
+#' \donttest{
+#' reshelf(desiderata)
 #' 
 #' # reshelf() returns invisibly; bind its output to a variable or access the .Last.value.
 #' 
-#' # print(.Last.value)
+#' print(.Last.value)
 #' 
 #' #> desiderata 
 #' #>       TRUE
-#' 
+#' }
 #' 
 #' @md
 reshelf <- function(...) {
@@ -258,10 +267,10 @@ reshelf <- function(...) {
 
 #' Changing and viewing the package search paths
 #' 
-#' Can add an existing folder to the library trees (the list of folders that R will 
-#' look inside when trying to find a package), or create a completely new folder and then 
-#' add it, or shuffle a folder to the front of the list so that it is used as the default 
-#' installation location for new packages in the current session.
+#' View and edit the list of folders that R will look inside when trying to find a 
+#' package. Add an existing folder, create and add a new folder, or shuffle a folder to 
+#' the front of the list so that it is used as the default installation location for new 
+#' packages in the current session.
 #'
 #' @param path (Character, or omit) A path to add to the library search path. Can be an 
 #'     absolute or relative path. If `path` has more than one element, only the first 
@@ -279,9 +288,11 @@ reshelf <- function(...) {
 #' @examples
 #' \donttest{
 #' lib_paths()
+#' 
 #' #> [1] "D:/R/R-3.5.0/library"
 #' 
 #' lib_paths(file.path(tempdir(), "newlibraryfolder"), ask = FALSE)
+#' 
 #' #> [1] "C:/Users/.../Temp/Rtmp0Qbvgo/newlibraryfolder"
 #' #> [2] "D:/R/R-3.5.0/library"
 #' }

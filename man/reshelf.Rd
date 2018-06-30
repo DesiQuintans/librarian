@@ -19,14 +19,15 @@ requested in \code{...} and \code{TRUE} means that the package was successfully 
 Detach and then reattach packages to the search path
 }
 \examples{
-# reshelf(desiderata)
+\donttest{
+reshelf(desiderata)
 
 # reshelf() returns invisibly; bind its output to a variable or access the .Last.value.
 
-# print(.Last.value)
+print(.Last.value)
 
 #> desiderata 
 #>       TRUE
-
+}
 
 }

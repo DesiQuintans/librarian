@@ -17,7 +17,7 @@ will be prompted to create it if \code{ask = TRUE}, otherwise it will be silentl
 created. Can be an absolute or relative path. Tilde expansion is performed on the
 input, but wildcard expansion (globbing) is not. If \code{lib} has more than one element,
 only the first one will be kept. Defaults to the current library search path. See
-'Working with multiple library folders' for more information.}
+the 'Details' section below for more information.}
 
 \item{update_all}{(Logical) If \code{TRUE}, the packages will be re-installed even if they
 are already in your library.}
@@ -29,7 +29,7 @@ before creating the folder. If \code{FALSE}, the folder will be created silently
 
 \item{cran_repo}{(Character) In RStudio, a default CRAN repo can be set via
 \emph{Options > Packages > Default CRAN Mirror}). Otherwise, provide the URL to CRAN or
-one of its mirrors (e.g. "https://cran.r-project.org").}
+one of its mirrors. If an invalid URL is given, defaults to https://cran.r-project.org.}
 }
 \value{
 Invisibly returns a named logical vector, where the names are the packages
@@ -41,27 +41,26 @@ Attach packages to the search path, installing them from CRAN or GitHub if neede
 }
 \details{
 You may choose to organise your library into folders to hold packages for different
-tasks or projects. You do this by specifying a \code{lib} folder to create it and attach it
-to the package search path. R will look for packages by working through the package
-search path in order. You can view the folders that are on this path by
+tasks or projects. If you specify a \code{lib} folder, it will be created (if needed) and
+attached to the package search path. R will look for packages by working through the
+package search path in order. You can view the folders that are on this path by
 calling \code{lib_paths()} with no arguments.
 
-\strong{If \code{lib} is a new folder but the packages in \code{...} are already installed in a
-different folder that is listed in \code{lib_paths()}:} \code{lib} will be created but the
-packages will be loaded from their current install location.
-
-\strong{If \code{update_all = TRUE} but the packages in \code{...} are already installed as above:}
-The packages will be installed to \code{lib}, and you will have two copies of this
-package, potentially with different versions, installed to two different places. The
-version in \code{lib} is the one that is attached.
+If you specify a new \code{lib} and use the argument \code{update_all = TRUE} to force an
+already-installed package to reinstall, a new copy of that package will be made in
+\code{lib} and then loaded from there. This means that you can potentially have several
+copies of the same package across many folders on your machine, each a different
+version. This allows you to maintain a different library folder for different projects,
+so that updated packages in Project B wil not affect the package versions you rely on
+for Project A.
 }
 \examples{
 \donttest{
-#shelf(fortunes, DesiQuintans/emptyRpackage, cowsay, lib = tempdir(), update_all = TRUE)
+shelf(fortunes, DesiQuintans/emptyRpackage, cowsay, lib = tempdir(), update_all = TRUE)
 
 # shelf() returns invisibly; bind its output to a variable or access the .Last.value.
 
-#print(.Last.value)
+print(.Last.value)
 
 #> fortunes desiderata     cowsay 
 #>     TRUE       TRUE       TRUE

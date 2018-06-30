@@ -12,18 +12,18 @@ unshelf(..., everything = FALSE, also_depends = FALSE, safe = TRUE,
 keep the username/package format, or omit the username and provide just the package
 name.}
 
-\item{everything}{(Logical) If this is \code{TRUE}, detach every non-default package
-including librarian. Any names in \code{...} are ignored. The default packages can
-be listed with \code{getOption("defaultPackages")}.}
+\item{everything}{(Logical) If \code{TRUE}, detach every non-default package including
+librarian. Any names in \code{...} are ignored. The default packages can be listed
+with \code{getOption("defaultPackages")}.}
 
-\item{also_depends}{(Logical) If this is \code{TRUE}, also detach the dependencies of the
-packages listed in \code{...}. This can be slow.}
+\item{also_depends}{(Logical) If \code{TRUE}, also detach the dependencies of the packages
+listed in \code{...}. This can be slow.}
 
-\item{safe}{(Logical) If this is \code{TRUE}, packages won't be detached if they are needed
-by other packages that are \strong{not} listed in \code{...}.}
+\item{safe}{(Logical) If \code{TRUE}, packages won't be detached if they are needed by other
+packages that are \strong{not} listed in \code{...}.}
 
-\item{quiet}{(Logical) If this is \code{FALSE}, show a message when packages can't be
-detached because they are still needed by other packages.}
+\item{quiet}{(Logical) If \code{FALSE}, show a message when packages can't be detached
+because they are still needed by other packages.}
 }
 \value{
 Invisibly returns a named logical vector, where the names are the packages
@@ -33,22 +33,24 @@ and \code{TRUE} means that the package was successfully detached.
 Detach (unload) packages from the search path
 }
 \examples{
+\donttest{
 # These are the same:
 
-# unshelf(janitor, desiderata, purrr)
-# unshelf(janitor, DesiQuintans/desiderata, purrr)
+unshelf(janitor, desiderata, purrr)
+unshelf(janitor, DesiQuintans/desiderata, purrr)
 
 # unshelf() returns invisibly; bind its output to a variable or access the .Last.value.
 
-# print(.Last.value)
+print(.Last.value)
 
-#> janitor desiderata      purrr 
-#>    TRUE       TRUE       TRUE 
+#> desiderata    janitor      purrr 
+#>       TRUE       TRUE       TRUE 
 
-# unshelf(everything = TRUE)
-# print(.Last.value)
+unshelf(everything = TRUE)
+print(.Last.value)
 
 #> librarian testthat
 #> TRUE      TRUE
+}
 
 }
