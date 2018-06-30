@@ -5,12 +5,37 @@
 #'
 #' @param ... (Names) Packages as bare names. If the package is from GitHub,
 #'    include both the username and package name as UserName/package (see examples).
+#' @param lib (Character) The path to the folder where new packages will be installed. The 
+#'    folder will be added to the package search path. If the folder doesn't exist, you 
+#'    will be prompted to create it if `ask = TRUE`, otherwise it will be silently 
+#'    created. Can be an absolute or relative path. Tilde expansion is performed on the 
+#'    input, but wildcard expansion (globbing) is not. If `lib` has more than one element, 
+#'    only the first one will be kept. Defaults to the current library search path. See 
+#'    'Working with multiple library folders' for more information.
 #' @param update_all (Logical) If `TRUE`, the packages will be re-installed even if they
 #'    are already in your library.
-#' @param quiet (Logical) Suppresses most warnings and messages.
+#' @param quiet (Logical) If `TRUE`, suppresses most warnings and messages.
+#' @param ask (Logical) If `TRUE`, and `lib` points to a folder that doesn't exist, ask 
+#'    before creating the folder. If `FALSE`, the folder will be created silently.
 #' @param cran_repo (Character) In RStudio, a default CRAN repo can be set via 
 #'    _Options > Packages > Default CRAN Mirror_). Otherwise, provide the URL to CRAN or 
 #'    one of its mirrors (e.g. "https://cran.r-project.org").
+#'
+#' @details  
+#' You may choose to organise your library into folders to hold packages for different 
+#' tasks or projects. You do this by specifying a `lib` folder to create it and attach it
+#' to the package search path. R will look for packages by working through the package 
+#' search path in order. You can view the folders that are on this path by 
+#' calling `lib_paths()` with no arguments.
+#' 
+#' **If `lib` is a new folder but the packages in `...` are already installed in a 
+#'    different folder that is listed in `lib_paths()`:** `lib` will be created but the 
+#'    packages will be loaded from their current install location.
+#'    
+#' **If `update_all = TRUE` but the packages in `...` are already installed as above:** 
+#'    The packages will be installed to `lib`, and you will have two copies of this 
+#'    package, potentially with different versions, installed to two different places. The 
+#'    version in `lib` is the one that is attached.
 #'
 #' @return Invisibly returns a named logical vector, where the names are the packages 
 #'    requested in `...` and `TRUE` means that the package was successfully installed 
@@ -18,18 +43,25 @@
 #' @export
 #'
 #' @examples
-#' 
-#' # shelf(janitor, DesiQuintans/desiderata, purrr)
+#' \donttest{
+#' #shelf(fortunes, DesiQuintans/emptyRpackage, cowsay, lib = tempdir(), update_all = TRUE)
 #' 
 #' # shelf() returns invisibly; bind its output to a variable or access the .Last.value.
 #' 
-#' # print(.Last.value)
+#' #print(.Last.value)
 #' 
-#' #> janitor desiderata      purrr 
-#' #>    TRUE       TRUE       TRUE 
+#' #> fortunes desiderata     cowsay 
+#' #>     TRUE       TRUE       TRUE
+#' }
 #' 
 #' @md
-shelf <- function(..., update_all = FALSE, quiet = FALSE, cran_repo = getOption("repos")) {
+shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask = TRUE, cran_repo = getOption("repos")) {
+    # install_github() lacks a `lib` argument and always installs to the first element 
+    # in .libPaths(). The install location must therefore be controlled by adding new 
+    # folders to the front of .libPaths(). lib_paths() is a wrapper that also includes
+    # automatic folder creation as a convenience to the user.
+    lib_paths(lib, make_path = TRUE, ask = ask)
+    
     # Automated testing fails with devtools::check() (but passes with devtools::test()) if
     # the repo arg for install.packages() is not set properly. If I run getOption("repos")
     # in R.exe running in the shell, I get the named vector c("CRAN" = "@CRAN@"), which is
@@ -50,7 +82,7 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, cran_repo = getOption(
         cran_repo <- "https://cran.r-project.org"
     }
     
-    # 1. Get dots (which contains all the packages I want)
+    # 1. Get dots (which contains the requested package names)
     packages <- nse_dots(..., keep_user = TRUE)
 
     # 2. Separate the GitHub packages from the CRAN ones. They'll contain a forward-slash.
@@ -71,11 +103,15 @@ shelf <- function(..., update_all = FALSE, quiet = FALSE, cran_repo = getOption(
     }
 
     if (length(cran_missing) > 0) {
-        utils::install.packages(cran_missing, quiet = quiet, repos = cran_repo)
+        suppress_lib_message(  # "Installing package into ... (as ‘lib’ is unspecified)"
+            utils::install.packages(cran_missing, quiet = quiet, repos = cran_repo)
+        )
     }
     
     if (length(github_missing) > 0) {
-        devtools::install_github(github_pkgs, quiet = quiet)
+        suppress_lib_message(
+            devtools::install_github(github_missing, quiet = quiet)
+        )
     }
 
     # 4. Find the packages that aren't attached yet.
@@ -212,7 +248,7 @@ unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, 
 #' @md
 reshelf <- function(...) {
     unshelf(..., safe = FALSE, warn = FALSE)
-    attached_status <- shelf(...)
+    attached_status <- shelf(..., quiet = TRUE)
     
     return(invisible(attached_status))
 }

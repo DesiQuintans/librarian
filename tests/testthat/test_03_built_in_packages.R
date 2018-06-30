@@ -15,7 +15,7 @@ test_that("'datasets' is attached by default, so unattach it.", {
 
 test_that("Try to shelf() datasets", {
     skip_on_cran()
-    expect_equal(sum(shelf(datasets)), 1)
+    expect_equal(sum(shelf(datasets, cran_repo = "https://cran.r-project.org")), 1)
 })
 
 test_that("Try to unshelf() datasets", {

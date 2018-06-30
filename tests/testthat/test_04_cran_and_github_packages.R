@@ -4,17 +4,16 @@ library(librarian)
 
 test_that("Install fortunes (CRAN) and emptyRpackage (GitHub)", {
     skip_on_cran()
-    # R CMD CHECK doesn't get access to getOption("repos")
-    expect_equal(sum(shelf(fortunes)), 1)
+    expect_equal(sum(shelf(fortunes, lib = tempdir(), quiet = TRUE, update_all = TRUE)), 1)
     expect_type(fortunes::fortune(), "list")
-    expect_equal(sum(shelf(DesiQuintans/emptyRpackage)), 1)
+    expect_equal(sum(shelf(DesiQuintans/emptyRpackage, lib = tempdir(), quiet = TRUE, update_all = TRUE)), 1)
     expect_type(emptyRpackage::hello_emptyR(), "character")
 })
 
-test_that("Try to install a package from a fake CRAN repo", {
+test_that("Check 'cran_repo' error catching and 'quiet' compliance.", {
     skip_on_cran()
-    expect_warning(shelf(fortunes, cran_repo = "this is not a URL"))
-    expect_silent(shelf(fortunes, quiet = TRUE, cran_repo = "this is not a URL"))
+    expect_warning(shelf(fortunes, lib = tempdir(), cran_repo = "this is not a URL"))
+    expect_silent(shelf(fortunes, lib = tempdir(), quiet = TRUE, cran_repo = "this is not a URL"))
 })
 
 test_that("Try to unshelf() fortunes and emptyRpackage", {

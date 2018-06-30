@@ -4,17 +4,28 @@
 \alias{shelf}
 \title{Attach packages to the search path, installing them from CRAN or GitHub if needed}
 \usage{
-shelf(..., update_all = FALSE, quiet = FALSE,
-  cran_repo = getOption("repos"))
+shelf(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE,
+  ask = TRUE, cran_repo = getOption("repos"))
 }
 \arguments{
 \item{...}{(Names) Packages as bare names. If the package is from GitHub,
 include both the username and package name as UserName/package (see examples).}
 
+\item{lib}{(Character) The path to the folder where new packages will be installed. The
+folder will be added to the package search path. If the folder doesn't exist, you
+will be prompted to create it if \code{ask = TRUE}, otherwise it will be silently
+created. Can be an absolute or relative path. Tilde expansion is performed on the
+input, but wildcard expansion (globbing) is not. If \code{lib} has more than one element,
+only the first one will be kept. Defaults to the current library search path. See
+'Working with multiple library folders' for more information.}
+
 \item{update_all}{(Logical) If \code{TRUE}, the packages will be re-installed even if they
 are already in your library.}
 
-\item{quiet}{(Logical) Suppresses most warnings and messages.}
+\item{quiet}{(Logical) If \code{TRUE}, suppresses most warnings and messages.}
+
+\item{ask}{(Logical) If \code{TRUE}, and \code{lib} points to a folder that doesn't exist, ask
+before creating the folder. If \code{FALSE}, the folder will be created silently.}
 
 \item{cran_repo}{(Character) In RStudio, a default CRAN repo can be set via
 \emph{Options > Packages > Default CRAN Mirror}). Otherwise, provide the URL to CRAN or
@@ -28,14 +39,32 @@ and attached.
 \description{
 Attach packages to the search path, installing them from CRAN or GitHub if needed
 }
+\details{
+You may choose to organise your library into folders to hold packages for different
+tasks or projects. You do this by specifying a \code{lib} folder to create it and attach it
+to the package search path. R will look for packages by working through the package
+search path in order. You can view the folders that are on this path by
+calling \code{lib_paths()} with no arguments.
+
+\strong{If \code{lib} is a new folder but the packages in \code{...} are already installed in a
+different folder that is listed in \code{lib_paths()}:} \code{lib} will be created but the
+packages will be loaded from their current install location.
+
+\strong{If \code{update_all = TRUE} but the packages in \code{...} are already installed as above:}
+The packages will be installed to \code{lib}, and you will have two copies of this
+package, potentially with different versions, installed to two different places. The
+version in \code{lib} is the one that is attached.
+}
 \examples{
-# shelf(janitor, DesiQuintans/desiderata, purrr)
+\donttest{
+#shelf(fortunes, DesiQuintans/emptyRpackage, cowsay, lib = tempdir(), update_all = TRUE)
 
 # shelf() returns invisibly; bind its output to a variable or access the .Last.value.
 
-# print(.Last.value)
+#print(.Last.value)
 
-#> janitor desiderata      purrr 
-#>    TRUE       TRUE       TRUE 
+#> fortunes desiderata     cowsay 
+#>     TRUE       TRUE       TRUE
+}
 
 }
