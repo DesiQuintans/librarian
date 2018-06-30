@@ -19,8 +19,10 @@ The dots list as a character vector.
 Non-standard evaluation of dots with base R
 }
 \examples{
+\donttest{
 nse_dots(package, names, here)
 
 #> [1] "package" "names"   "here"   
+}
 
 }

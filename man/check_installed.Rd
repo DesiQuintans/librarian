@@ -18,6 +18,7 @@ vector showing if the packages are installed or not.
 Check installed packages
 }
 \examples{
+\donttest{
 check_installed()
 
 #>   [1] "addinslist"  "antiword" " ape"  "assertthat"  ...
@@ -26,5 +27,6 @@ check_installed(c("utils", "stats"))
 
 #> utils stats 
 #> TRUE  TRUE 
+}
 
 }

@@ -18,6 +18,7 @@ vector showing if the packages are attached or not.
 Check attached packages
 }
 \examples{
+\donttest{
 check_attached()
 
 #> [1] "stats"  "graphics"  "grDevices"  ...
@@ -26,5 +27,6 @@ check_attached(c("utils", "stats"))
 
 #> utils stats 
 #> TRUE  TRUE 
+}
 
 }

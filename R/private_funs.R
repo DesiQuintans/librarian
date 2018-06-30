@@ -10,9 +10,11 @@
 #' @return The dots list as a character vector.
 #'
 #' @examples
+#' \donttest{
 #' nse_dots(package, names, here)
 #' 
 #' #> [1] "package" "names"   "here"   
+#' }
 #' 
 #' @md
 nse_dots <- function(..., keep_user = FALSE) {
@@ -38,6 +40,7 @@ nse_dots <- function(..., keep_user = FALSE) {
 #'     vector showing if the packages are installed or not.
 #'
 #' @examples
+#' \donttest{
 #' check_installed()
 #' 
 #' #>   [1] "addinslist"  "antiword" " ape"  "assertthat"  ...
@@ -46,6 +49,7 @@ nse_dots <- function(..., keep_user = FALSE) {
 #' 
 #' #> utils stats 
 #' #> TRUE  TRUE 
+#' }
 #' 
 #' @md
 check_installed <- function(packages = NULL) {
@@ -71,6 +75,7 @@ check_installed <- function(packages = NULL) {
 #'     vector showing if the packages are attached or not.
 #'
 #' @examples
+#' \donttest{
 #' check_attached()
 #' 
 #' #> [1] "stats"  "graphics"  "grDevices"  ...
@@ -79,6 +84,7 @@ check_installed <- function(packages = NULL) {
 #' 
 #' #> utils stats 
 #' #> TRUE  TRUE 
+#' }
 #' 
 #' @md
 check_attached <- function(packages = NULL) {
@@ -96,7 +102,7 @@ check_attached <- function(packages = NULL) {
 
 #' Build a path, creating subfolders if needed
 #'
-#' Whereas `base::file.path()` only concatenates strings to build a path, `make_path()`
+#' Whereas `base::file.path()` only concatenates strings to build a path, `make_dirs()`
 #' *also* makes sure those folders exist.
 #'
 #' @param ... (Character) Arguments to send to `file.path()`. You can provide a complete
@@ -105,14 +111,11 @@ check_attached <- function(packages = NULL) {
 #' @return (Character) A file path. Automatically adds trailing slashes if required.
 #'
 #' @examples
-#' # make_path("path", "to", "subfolder")
+#' \donttest{
+#' make_dirs(tempdir(), "newfolder")
 #'
-#' #> [1] "path/to/subfolder"
-#' # And the path/to/subfolder/ folders were also created in the working directory.
-#'
-#' # saveRDS(iris, make_path("subfolders/to/compiled/data/iris.rds"))
-#'
-#' # Creates all of the subfolders required for writing iris.rds.
+#' #> [1] "C:/Users/.../Temp/RtmpSwZA8X/newfolder"
+#' }
 #'
 #' @section Authors:
 #' - Desi Quintans (<http://www.desiquintans.com>)
@@ -145,6 +148,33 @@ make_dirs <- function(...) {
     
     return(normalizePath(path, winslash = "/"))
 }
+
+
+
+#' Suppress "lib unspecified" message
+#' 
+#' This is used to suppress a specific warning message that is printed by install.packages
+#' and remove.packages, which is caused by the 'lib' arg not being assigned in the 
+#' function call. In particular, devtools::install_github() ultimately 
+#'
+#' @param expr (Expression) A function call.
+#'
+#' @return Runs the expression, suppressing the "(as 'lib' is unspecified)" message only.
+#' 
+#' @examples
+#' \donttest{
+#' suppress_lib_message(remove.packages(fortunes))
+#' }
+suppress_lib_message <- function(expr) {
+    regex = "\\(as .lib. is unspecified\\)"
+    
+    withCallingHandlers(expr, message = function(w) {
+        if (length(regex) == 1 && length(grep(regex, conditionMessage(w)))) {
+            invokeRestart("muffleMessage")
+        }
+    })
+}
+
 
 
 # Runs with devtools::release().

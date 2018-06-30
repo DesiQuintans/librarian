@@ -14,7 +14,7 @@ path as a single string, or incrementally build a path with many strings.}
 (Character) A file path. Automatically adds trailing slashes if required.
 }
 \description{
-Whereas \code{base::file.path()} only concatenates strings to build a path, \code{make_path()}
+Whereas \code{base::file.path()} only concatenates strings to build a path, \code{make_dirs()}
 \emph{also} makes sure those folders exist.
 }
 \section{Authors}{
@@ -32,13 +32,10 @@ Whereas \code{base::file.path()} only concatenates strings to build a path, \cod
 }
 
 \examples{
-# make_path("path", "to", "subfolder")
+\donttest{
+make_dirs(tempdir(), "newfolder")
 
-#> [1] "path/to/subfolder"
-# And the path/to/subfolder/ folders were also created in the working directory.
-
-# saveRDS(iris, make_path("subfolders/to/compiled/data/iris.rds"))
-
-# Creates all of the subfolders required for writing iris.rds.
+#> [1] "C:/Users/.../Temp/RtmpSwZA8X/newfolder"
+}
 
 }
