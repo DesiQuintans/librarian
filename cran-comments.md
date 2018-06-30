@@ -2,11 +2,15 @@
 
 This is a resubmission. I have made these changes based on your feedback:
 
-    - Improved terminology (packages, search paths, libraries, etc.)
-    - Functions return a vector of success/failure for each package that was operated on.
-    - Readme teaches the user how to specify a library location.
-    - User can now set a CRAN mirror.
+    - Added a lib argument to shelf() so that users can define a library folder.
+    - Added lib_paths(), which wraps .libPaths() and offers automatic folder creation.
+    - Wrapped examples in \donttest{} instead of commenting them out.
+    - Removed function names from DESCRIPTION field.
 
+Other comments:
+
+    - You suggested that maybe the 'lib' arg could be passed through install_github() down 
+      to install.packages(), but unfortunately not.
 
 ## Test environments
 
