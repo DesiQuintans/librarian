@@ -18,7 +18,7 @@ librarian::shelf(dplyr, DesiQuintans/desiderata, purrr)
       `library(janitor)`  
       `library(desiderata)`
 - **It has a consistent interface.**  
-It bothered me that `install.packages` can install many packages, but `library` can only attach one at a time. _librarian_ will install and attach them all.
+It bothered me that `install.packages()` can install many packages, but `library()` can only attach one at a time. _librarian_ will install and attach them all.
 - **Packages are bare names.**  
 Miss me with those quoted names, they're such a hassle! _librarian_ uses bare names so that it's easier to maintain a package list. If you're trying a different analysis and you need a new package, just add it to the list and it will download and attach with a few keystrokes.
 
@@ -26,65 +26,67 @@ When I was coming up with a naming scheme for this package and its functions, I 
 
 ## Installation
 
-_librarian_ has been submitted to CRAN, and is waiting for approval. For now, you can install _librarian_ from GitHub with:
+You can install _librarian_ from CRAN or from GitHub. The GitHub version is under constant development, but it is stable for use.
 
 ``` r
-install.packages("devtools")
+# From CRAN:
 
+install.packages("librarian")
+
+# From GitHub:
+
+install.packages("devtools")
 devtools::install_github("DesiQuintans/librarian")
+```
+
+Once it's installed, you can either access the functions directly with `::` notation, or attach it with `library()`.
+
+``` r
+# I prefer to use
+
+librarian::shelf(...)
+librarian::unshelf(...)
+librarian::reshelf(...)
+
+# But you can use
 
 library(librarian)
 
-# But instead of attaching librarian, I prefer to use:
-
-librarian::shelf(...)
-
-librarian::unshelf(...)
-
-librarian::reshelf(...)
+shelf(...)
+unshelf(...)
+reshelf(...)
 ```
 
-## Selecting a library location
+## Quick tour of _librarian_
 
-If you want to define a custom location for your library:
+More in-depth documentation for each function is in the [Examples section](#examples) below.
 
-``` r
-.libPaths("Path/to/library/folder")
-```
+|      Function | Example                                  | Description                                                                        |
+| ------------: | :--------------------------------------- | :--------------------------------------------------------------------------------- |
+| `lib_paths()` | `lib_paths("C:/new_lib_folder")`         | View and edit the folders where R will install and search for packages.            |
+|     `shelf()` | `shelf(cowsay, DesiQuintans/desiderata)` | Attach packages to the search path, installing them from CRAN or GitHub if needed. They will be installed to the first folder in `lib_paths()`. |
+|   `unshelf()` | `unshelf(cowsay, desiderata)`            | Detach packages from the search path. You can also detach their dependencies.      |
+|   `reshelf()` | `reshelf(desiderata)`                    | Detach and then reattach packages, helpful for refreshing a personal package.      |
 
-You can apply this to every R session by adding it to the `.First()` function in your site profile (`R\R-3.x.x\etc\Rprofile.site`):
+
+## Setting a custom library location at the start of every R session
+
+If you want your custom library folder to be applied at the start of every R session, navigate to your R site profile (`R/R-3.x.x/etc/Rprofile.site`), open it in a text editor, and put this at the end of the file:
 
 ``` r
 .First <- function(){
     .libPaths("Path/to/library/folder")
 }
 ```
-If you install R outside the system's user folders, then you can edit your site profile without needing administrator rights, which is very handy. 
 
-If you edit the site profile for every version of R you have installed, you can install a package once and then access it in all of your R versions (assuming the R version meets the packages' requirements, of course). I have my library on Dropbox so that I can use them at home, at work, and on my laptop and always know that it's the same version.
+If R is installed outside the system's protected user folders, then this file should be editable without administrator rights.
 
-## Project participants
+If you edit the site profile for every version of R you have installed, you can install a package once and then access it in all of your R versions (assuming the R version meets the packages' requirements, of course). I have my library on Dropbox so that I can use my packages at home, at work, and on my laptop and always know that it's the same version.
 
--   Desi Quintans (<https://twitter.com/eco_desi>)
-
-Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
-
----
-
-## Functions included
-
-|      Function | Example                                  | Description                                                                        |
-| ------------: | :--------------------------------------- | :--------------------------------------------------------------------------------- |
-|     `shelf()` | `shelf(cowsay, DesiQuintans/desiderata)` | Attach packages to the search path, installing them from CRAN or GitHub if needed. |
-|   `unshelf()` | `unshelf(cowsay, desiderata)`            | Detach packages from the search path.                                              |
-|   `reshelf()` | `reshelf(desiderata)`                    | Detach and then reattach packages, helpful for refreshing a personal package.      |
-| `lib_paths()` | `lib_paths("C:/new_lib_folder")`         | View and edit the folders where R will install and search for packages.            |
-
----
 
 ## Examples
 
-### `shelf`
+### shelf
 
 `shelf()` attaches packages to the search path, first installing them from CRAN or GitHub if needed.
 
@@ -135,7 +137,9 @@ print(.Last.value)
 #>      TRUE       TRUE       TRUE
 ```
 
-### `unshelf`
+---
+
+### unshelf
 
 When detaching GitHub packages with `unshelf()`, you can provide the package names only, or you can provide the full username/package identifier as you did with `shelf()`. 
 
@@ -196,7 +200,9 @@ librarian:::check_attached()
 
 In the example above, setting `quiet = TRUE` will suppress the "some packages were not detached" message.
 
-### `reshelf`
+---
+
+### reshelf
 
 `reshelf()` detaches and then reattaches packages. This is useful when you have a personal package, because you'll often find yourself adding a function to it and rebuilding it in one instance of RStudio, and then reloading the new build in a different RStudio instance that contains your actual work. Its return value is identical to `shelf()`.
 
@@ -209,7 +215,9 @@ unshelf(DesiQuintans/desiderata, safe = FALSE, warn = FALSE))
   shelf(DesiQuintans/desiderata)
 ```
 
-### `lib_paths`
+---
+
+### lib_paths
 
 `lib_paths()` lets you view and edit the list of folders that R will look inside when trying to find a package (the package search path). You can also add an existing folder, create and add a new folder, or shuffle a folder to the front of the list so that it is used as the default installation location for new packages in the current session.
 
@@ -259,3 +267,11 @@ lib_paths(file.path(tempdir(), "newlibraryfolder"))
 #> [2] "C:/Users/.../Temp/Rtmp0Qbvgo/another_folder"
 #> [3] "D:/R/R-3.5.0/library"
 ```
+
+---
+
+## Project participants
+
+-   Desi Quintans (<https://twitter.com/eco_desi>)
+
+Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
