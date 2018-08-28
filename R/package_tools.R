@@ -168,7 +168,7 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
 #' 
 #' @md
 unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, quiet = TRUE) {
-    if (...length() == 0 && everything == FALSE) {
+    if (backports:::...length() == 0 && everything == FALSE) {
         # Errors should not be 'quiet'-able.
         stop("No packages were chosen for detaching. Either provide the names of ", 
              "packages, or set 'everything = TRUE' to detach all non-Base packages.")
