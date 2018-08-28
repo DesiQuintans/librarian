@@ -55,6 +55,11 @@
 #' 
 #' @md
 shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask = TRUE, cran_repo = getOption("repos")) {
+    if (backports:::...length() == 0) {
+        # Errors should not be 'quiet'-able.
+        stop("No packages were chosen for attaching.")
+    }
+    
     # install_github() lacks a `lib` argument and always installs to the first element 
     # in .libPaths(). The install location must therefore be controlled by adding new 
     # folders to the front of .libPaths(). lib_paths() is a wrapper that also includes
