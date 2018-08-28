@@ -76,7 +76,7 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
     # shortest regex that matches every CRAN mirror at https://cran.r-project.org/mirrors.html
     cran_repo_is_url <- grepl("(https?|ftp)://[^\\s/$.?#].[^\\s]*", cran_repo)
     
-    if (cran_repo_is_url == FALSE) {
+    if (any(cran_repo_is_url) == FALSE) {
         if (quiet == FALSE) {
             warning("cran_repo = '", as.character(cran_repo), "' is not a valid URL. 
                     Defaulting to cran_repo = 'https://cran.r-project.org'.")
