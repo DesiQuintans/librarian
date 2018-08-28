@@ -1,3 +1,9 @@
+# librarian 1.3.1
+
+- FIX - librarian was written for R 3.5.0 but only asked for 3.4.0 as a dependency. The R dependency is now 3.5.0.
+- MOD - I have added a dependency for `backports` so that users of R < 3.5.0 do not have to update their R installation for only one important function that librarian needs (`...length()`). Closes issue #4.
+- FIX - Sometimes the CRAN URL check would return a vector of length >1, raising a warning message.
+
 # librarian 1.3.0
 
 - ADD - `lib_paths()` is a wrapper for `.libPaths()` with folder creation built-in. It
