@@ -1,3 +1,7 @@
+# librarian 1.3.2
+
+- REVERT - R dependency back to => 3.4.0.
+
 # librarian 1.3.1
 
 - FIX - librarian was written for R 3.5.0 but only asked for 3.4.0 as a dependency. The R dependency is now 3.5.0.

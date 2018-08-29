@@ -1,6 +1,6 @@
 Package: librarian
 Title: Install, Update, Load Packages from CRAN and 'GitHub' in One Step
-Version: 1.3.1
+Version: 1.3.2
 Authors@R: person("Desi", "Quintans", email = "science@desiquintans.com",
                   role = c("aut", "cre"))
 Description: Automatically install, update, and load 'CRAN' and 'GitHub' packages in a 
@@ -8,14 +8,14 @@ Description: Automatically install, update, and load 'CRAN' and 'GitHub' package
     or remove packages from the list.
 URL: https://github.com/DesiQuintans/librarian
 BugReports: https://github.com/DesiQuintans/librarian/issues
-Depends: R (>= 3.5.0)
+Depends: R (>= 3.4.0)
 License: GPL-3
 Encoding: UTF-8
 Imports:
     backports (>= 1.1.2),
     devtools (>= 1.13.0),
-    tools (>= 3.5.0),
-    utils (>= 3.5.0)
+    tools (>= 3.4.0),
+    utils (>= 3.4.0)
 LazyData: true
 RoxygenNote: 6.0.1
 Suggests: testthat
