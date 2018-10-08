@@ -105,10 +105,14 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
         cran_missing   <- cran_pkgs[which(!cran_pkgs %in% check_installed())]
         github_missing <- github_pkgs[which(!check_installed(github_bare_pkgs))]
     }
-
+    
     if (length(cran_missing) > 0) {
-        suppress_lib_message(  # "Installing package into ... (as ‘lib’ is unspecified)"
-            utils::install.packages(cran_missing, quiet = quiet, repos = cran_repo)
+        suppressWarnings(
+            # Packages not on CRAN (i.e. Bioconductor) raise a "not available" warning
+            # that I cannot seem to suppress with invokeRestart().
+            suppress_lib_message(  # "Installing package into ... (as ‘lib’ is unspecified)"
+                utils::install.packages(cran_missing, quiet = quiet, repos = cran_repo)
+            )
         )
     }
     
@@ -117,11 +121,31 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
             devtools::install_github(github_missing, quiet = quiet)
         )
     }
-
-    # 4. Find the packages that aren't attached yet.
+    
+    # 4. If some CRAN packages failed to install and the user has Bioconductor installed,
+    # then the missing packages are probably Bioconductor packages.
+    if (sum(!check_installed(cran_missing)) > 0 & check_installed("Biobase") == TRUE) {
+        cran_still_missing <- cran_missing[which(!cran_missing %in% check_installed())]
+        
+        if (exists("biocLite") == FALSE) {
+            suppressWarnings(
+                suppressMessages(
+                    source("https://bioconductor.org/biocLite.R", echo = FALSE, verbose = FALSE)
+                )
+            )
+        }
+        
+        suppressMessages(
+            suppressWarnings(
+                biocLite(cran_still_missing, suppressUpdates = TRUE)
+            )
+        )
+    }
+    
+    # 5. Find the packages that aren't attached yet.
     not_attached <- all_pkgs[which(!check_attached(all_pkgs))]
     
-    # 5. Attach those packages.
+    # 6. Attach those packages.
     if (length(not_attached) > 0) {
         lapply(not_attached, library, character.only = TRUE, quietly = quiet)
     }
