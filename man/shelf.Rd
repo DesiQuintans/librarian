@@ -2,10 +2,11 @@
 % Please edit documentation in R/package_tools.R
 \name{shelf}
 \alias{shelf}
-\title{Attach packages to the search path, installing them from CRAN or GitHub if needed}
+\title{Attach packages to the search path, installing them from CRAN, GitHub, or Bioconductor if needed}
 \usage{
 shelf(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE,
-  ask = TRUE, cran_repo = getOption("repos"))
+  ask = TRUE, cran_repo = getOption("repos"),
+  bioc_repo = character())
 }
 \arguments{
 \item{...}{(Names) Packages as bare names. If the package is from GitHub,
@@ -30,6 +31,9 @@ before creating the folder. If \code{FALSE}, the folder will be created silently
 \item{cran_repo}{(Character) In RStudio, a default CRAN repo can be set via
 \emph{Options > Packages > Default CRAN Mirror}). Otherwise, provide the URL to CRAN or
 one of its mirrors. If an invalid URL is given, defaults to https://cran.r-project.org.}
+
+\item{bioc_repo}{(Character) If you use Bioconductor, you can set the repo URLs for it here.
+Defaults to Bioconductor's defaults (view them with \code{BiocInstaller::biocinstallRepos()}).}
 }
 \value{
 Invisibly returns a named logical vector, where the names are the packages
@@ -37,7 +41,7 @@ requested in \code{...} and \code{TRUE} means that the package was successfully 
 and attached.
 }
 \description{
-Attach packages to the search path, installing them from CRAN or GitHub if needed
+Attach packages to the search path, installing them from CRAN, GitHub, or Bioconductor if needed
 }
 \details{
 You may choose to organise your library into folders to hold packages for different

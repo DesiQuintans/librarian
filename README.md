@@ -1,22 +1,24 @@
-# `librarian` - One-step packages from CRAN and GitHub
+# `librarian` - One-step packages from CRAN, GitHub, and Bioconductor
 
 ``` r
-librarian::shelf(dplyr, DesiQuintans/desiderata, purrr)
+librarian::shelf(dplyr, DesiQuintans/desiderata, zlibbioc)
                    ↑        ↑                      ↑
-                  CRAN     GitHub                 CRAN
+                  CRAN     GitHub                 Bioconductor
 
 # All downloaded, installed, and attached.
 ```
 
-`librarian` lets you quickly install, update, and attach packages from CRAN and GitHub in the same function call. It has these advantages over base R and other library management packages like `pacman`:
+`librarian` lets you quickly install, update, and attach packages from CRAN, GitHub, and Bioconductor in the same function call. It has these advantages over base R and other library management packages like `pacman`:
 
 - **It's one function.**  
-    - `shelf(janitor, DesiQuintans/desiderata)`  
+    - `shelf(dplyr, DesiQuintans/desiderata, zlibbioc)`  
       **NOT**  
-      `install.packages("janitor")`  
+      `install.packages("dplyr")`  
       `devtools::install_github("DesiQuintans/desiderata")`  
-      `library(janitor)`  
+      `biocLite("zlibbioc")`
+      `library(dplyr)`  
       `library(desiderata)`
+      `library(zlibbioc)`
 - **It has a consistent interface.**  
 It bothered me that `install.packages()` can install many packages, but `library()` can only attach one at a time. _librarian_ will install and attach them all.
 - **Packages are bare names.**  
@@ -64,7 +66,7 @@ More in-depth documentation for each function is in the [Examples section](#exam
 |      Function | Example                                  | Description                                                                        |
 | ------------: | :--------------------------------------- | :--------------------------------------------------------------------------------- |
 | `lib_paths()` | `lib_paths("C:/new_lib_folder")`         | View and edit the folders where R will install and search for packages.            |
-|     `shelf()` | `shelf(cowsay, DesiQuintans/desiderata)` | Attach packages to the search path, installing them from CRAN or GitHub if needed. They will be installed to the first folder in `lib_paths()`. |
+|     `shelf()` | `shelf(cowsay, DesiQuintans/desiderata)` | Attach packages to the search path, installing them from CRAN, Bioconductor, or GitHub if needed. They will be installed to the first folder in `lib_paths()`. |
 |   `unshelf()` | `unshelf(cowsay, desiderata)`            | Detach packages from the search path. You can also detach their dependencies.      |
 |   `reshelf()` | `reshelf(desiderata)`                    | Detach and then reattach packages, helpful for refreshing a personal package.      |
 
@@ -88,13 +90,16 @@ If you edit the site profile for every version of R you have installed, you can 
 
 ### shelf
 
-`shelf()` attaches packages to the search path, first installing them from CRAN or GitHub if needed.
+`shelf()` attaches packages to the search path, first installing them from CRAN, GitHub, or Bioconductor if needed.
+
+The order of package names does not matter.
 
 For CRAN packages, provide the package name as normal.
+For Bioconductor packages, provide the package name as normal **and make sure that Bioconductor's `Biobase` package is installed.**
 For GitHub packages, provide the username and package name separated by `/`.
 
 ``` r
-shelf(cowsay, DesiQuintans/desiderata)
+shelf(cowsay, DesiQuintans/desiderata, zlibbioc)
 ```
 
 The default installation folder is always the first folder in `lib_paths()`. To change the installation folder, set the `lib` argument.
@@ -106,6 +111,8 @@ shelf(cowsay, DesiQuintans/desiderata, lib = "C:/new_lib_folder", ask = TRUE)
 ```
 
 You can download from a specific CRAN mirror by setting `cran_repo`. The default value of `cran_repo` is the value set in `getOption("repos")`. You can set this in RStudio using _Options > Packages > Default CRAN Mirror_. If you are not in RStudio this option may not be correctly set. In all cases where `cran_repo` is not a valid URL, it defaults to `https://cran.r-project.org`.
+
+You can also set a Bioconductor repo using the `bioc_repo` argument, although it perhaps better to use the built-in `utils::chooseBioCmirror()` function.
 
 ``` r
 shelf(dplyr, cran_repo = "https://cran.csiro.au/")

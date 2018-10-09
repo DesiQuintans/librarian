@@ -177,35 +177,6 @@ suppress_lib_message <- function(expr) {
 
 
 
-#' Check if a package exists on CRAN
-#'
-#' Most authors check the existence of a CRAN package by using `utils::available.packages()`
-#' to fetch a list of all packages that are on CRAN. However, this list is >1 Mb and 
-#' 'librarian' has empathy for people with bad internet connectivity. Instead, this 
-#' function tries to access the CRAN page for each requested package. Pages that return
-#' errors indicate that the package does not exist on CRAN.
-#'
-#' @param packages (Character) A vector of package names.
-#'
-#' @return A named logical vector where the names are the URLs that were accessed, and the
-#'     result is whether the URL exists (`TRUE`) or returns an error (`FALSE`).
-#'
-#' @examples
-#' \dontrun{
-#' exists_on_CRAN(c("MASS", "ape", "my_fake_package"))
-#' }
-#' 
-#' @md
-exists_on_CRAN <- function(packages) {
-    cran_urls <- paste0("https://cran.r-project.org/package=", packages)
-    results <- sapply(cran_urls, httr::http_error)  # httr is 2x faster than RCurl
-    names(results) <- packages
-    
-    return(!results)  # Flipped because http_error() returns FALSE when no error is found.
-}
-
-
-
 # Runs with devtools::release().
 release_questions <- function() {
     c(

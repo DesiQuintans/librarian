@@ -1,7 +1,7 @@
 # Package management
 
 
-#' Attach packages to the search path, installing them from CRAN or GitHub if needed
+#' Attach packages to the search path, installing them from CRAN, GitHub, or Bioconductor if needed
 #'
 #' @param ... (Names) Packages as bare names. If the package is from GitHub,
 #'    include both the username and package name as UserName/package (see examples).
@@ -20,6 +20,8 @@
 #' @param cran_repo (Character) In RStudio, a default CRAN repo can be set via 
 #'    _Options > Packages > Default CRAN Mirror_). Otherwise, provide the URL to CRAN or 
 #'    one of its mirrors. If an invalid URL is given, defaults to https://cran.r-project.org.
+#' @param bioc_repo (Character) If you use Bioconductor, you can set the repo URLs for it here.
+#'    Defaults to Bioconductor's defaults (view them with `BiocInstaller::biocinstallRepos()`).
 #'
 #' @details  
 #' You may choose to organise your library into folders to hold packages for different 
@@ -54,7 +56,8 @@
 #' }
 #' 
 #' @md
-shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask = TRUE, cran_repo = getOption("repos")) {
+shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask = TRUE, 
+                  cran_repo = getOption("repos"), bioc_repo = character()) {
     if (backports:::...length() == 0) {
         # Errors should not be 'quiet'-able.
         stop("No packages were chosen for attaching.")
@@ -93,7 +96,7 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
     github_pkgs <- grep("^.*?/.*?$", packages, value = TRUE)
     github_bare_pkgs <- sub(".*?/", "", github_pkgs)
     
-    cran_pkgs <- packages[!(packages %in% github_pkgs)]
+    cran_pkgs <- packages[!(packages %in% github_pkgs)]  # This may also contain Bioconductor pkgs.
     all_pkgs <- append(cran_pkgs, github_bare_pkgs)
     
     # 3a. If a package is missing from the library, install it.
@@ -102,14 +105,12 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
         cran_missing   <- cran_pkgs
         github_missing <- github_pkgs
     } else {
-        cran_missing   <- cran_pkgs[which(!cran_pkgs %in% check_installed())]
+        cran_missing   <- cran_pkgs[which(!check_installed(cran_pkgs))]
         github_missing <- github_pkgs[which(!check_installed(github_bare_pkgs))]
     }
     
     if (length(cran_missing) > 0) {
-        suppressWarnings(
-            # Packages not on CRAN (i.e. Bioconductor) raise a "not available" warning
-            # that I cannot seem to suppress with invokeRestart().
+        suppressWarnings(  # Warnings from trying to install non-CRAN packages (i.e. Bioconductor).
             suppress_lib_message(  # "Installing package into ... (as ‘lib’ is unspecified)"
                 utils::install.packages(cran_missing, quiet = quiet, repos = cran_repo)
             )
@@ -122,11 +123,10 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
         )
     }
     
-    # 4. If some CRAN packages failed to install and the user has Bioconductor installed,
-    # then the missing packages are probably Bioconductor packages.
-    if (sum(!check_installed(cran_missing)) > 0 & check_installed("Biobase") == TRUE) {
-        cran_still_missing <- cran_missing[which(!cran_missing %in% check_installed())]
-        
+    # 4. CRAN packages that failed to install may be Bioconductor packages.
+    cran_still_missing <- cran_missing[which(!check_installed(cran_missing))]
+    
+    if (length(cran_still_missing) > 0 & check_installed("Biobase") == TRUE) {
         if (exists("biocLite") == FALSE) {
             suppressWarnings(
                 suppressMessages(
@@ -137,17 +137,31 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
         
         suppressMessages(
             suppressWarnings(
-                biocLite(cran_still_missing, suppressUpdates = TRUE)
+                # By my understanding, biocLite with `suppressUpdates = TRUE` will
+                # automatically update the requested Bioconductor packages, but will NOT
+                # update all other installed packages too. I tried running it with
+                # `ask = FALSE` and it updated everything in my R installation :/
+                biocLite(cran_still_missing, suppressUpdates = TRUE, siteRepos = bioc_repo, quiet = quiet)
             )
         )
     }
     
-    # 5. Find the packages that aren't attached yet.
-    not_attached <- all_pkgs[which(!check_attached(all_pkgs))]
+    # 5a. Find the packages that aren't attached yet.
+    # 5b. Omit any packages that failed installation.
+    not_attached <- all_pkgs[which(check_installed(all_pkgs) == TRUE & check_attached(all_pkgs) == FALSE)]
+    failed_install <- all_pkgs[which(!check_installed(all_pkgs))]
     
     # 6. Attach those packages.
     if (length(not_attached) > 0) {
         lapply(not_attached, library, character.only = TRUE, quietly = quiet)
+    }
+    
+    if (length(failed_install) > 0) {
+        warning("These packages failed to install and were not attached:\n\n",
+                "    ", failed_install, "\n\n",
+                "  Are they Bioconductor packages? If so, please install Bioconductor\n",
+                "  before running librarian::shelf().\n",
+                "  Otherwise, check the spelling and capitalisation of the names.")
     }
     
     return(invisible(check_attached(nse_dots(..., keep_user = FALSE))))
