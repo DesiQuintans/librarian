@@ -13,9 +13,9 @@ suppress_lib_message(expr)
 Runs the expression, suppressing the "(as 'lib' is unspecified)" message only.
 }
 \description{
-This is used to suppress a specific warning message that is printed by install.packages
-and remove.packages, which is caused by the 'lib' arg not being assigned in the 
-function call. In particular, devtools::install_github() ultimately
+This is used to suppress a specific warning message that is printed by install.packages()
+and remove.packages(), which is caused by the 'lib' arg not being assigned in the 
+function call.
 }
 \examples{
 \dontrun{

@@ -1,3 +1,7 @@
+# librarian 1.4.0
+
+- ADD - `shelf()` now supports installing Bioconductor packages via `biocLite()`. Bioconductor's `Biobase` package needs to be installed before *librarian* will attempt to install Bioconductor packages.
+
 # librarian 1.3.2
 
 - REVERT - R dependency back to => 3.4.0.
