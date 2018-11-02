@@ -41,39 +41,45 @@ install.packages("devtools")
 devtools::install_github("DesiQuintans/librarian")
 ```
 
-Once it's installed, you can either access the functions directly with `::` notation, or attach it with `library()`.
+Once it's installed, you can get librarian to automatically load at the start of every R session:
 
 ``` r
-# I prefer to use
+librarian::lib_startup(librarian, global = TRUE)
+```
 
+And you can also specify a library folder to install new packages into by default:
+
+``` r
+librarian::lib_startup(librarian, lib = "C:/Dropbox/My R Library", global = TRUE)
+```
+
+
+Or if you don't want to do that, you can attach it with `library(librarian)` or access the functions directly with `::` notation:
+
+
+``` r
 librarian::shelf(...)
 librarian::unshelf(...)
 librarian::reshelf(...)
-
-# But you can use
-
-library(librarian)
-
-shelf(...)
-unshelf(...)
-reshelf(...)
 ```
 
 ## Quick tour of _librarian_
 
 More in-depth documentation for each function is in the [Examples section](#examples) below.
 
-|      Function | Example                                  | Description                                                                        |
-| ------------: | :--------------------------------------- | :--------------------------------------------------------------------------------- |
-| `lib_paths()` | `lib_paths("C:/new_lib_folder")`         | View and edit the folders where R will install and search for packages.            |
-|     `shelf()` | `shelf(cowsay, DesiQuintans/desiderata)` | Attach packages to the search path, installing them from CRAN, Bioconductor, or GitHub if needed. They will be installed to the first folder in `lib_paths()`. |
-|   `unshelf()` | `unshelf(cowsay, desiderata)`            | Detach packages from the search path. You can also detach their dependencies.      |
-|   `reshelf()` | `reshelf(desiderata)`                    | Detach and then reattach packages, helpful for refreshing a personal package.      |
-
+| Function                 | Example                                    | Description                                                                                                                                                    |
+| ------------:            | :---------------------------------------   | :---------------------------------------------------------------------------------                                                                             |
+| `shelf()`                | `shelf(cowsay, DesiQuintans/desiderata)`   | Attach packages to the search path, installing them from CRAN, Bioconductor, or GitHub if needed. They will be installed to the first folder in `lib_paths()`. |
+| `unshelf()`              | `unshelf(cowsay, desiderata)`              | Detach packages from the search path. You can also detach their dependencies.                                                                                  |
+| `reshelf()`              | `reshelf(desiderata)`                      | Detach and then reattach packages, helpful for refreshing a personal package.                                                                                  |
+| `lib_paths()`            | `lib_paths("C:/new_lib_folder")`           | View and edit the folders where R will install and search for packages.                                                                                        |
+| `lib_startup()` | `lib_startup(librarian, forcats)` | Automatically attach libraries and packages at the start of every R session.                                                                                        |
 
 ## Setting a custom library location at the start of every R session
 
-If you want your custom library folder to be applied at the start of every R session, navigate to your R site profile (`R/R-3.x.x/etc/Rprofile.site`), open it in a text editor, and put this at the end of the file:
+You can also use your custom library folder to be applied at the start of every R session, 
+
+navigate to your R site profile (`R/R-3.x.x/etc/Rprofile.site`), open it in a text editor, and put this at the end of the file:
 
 ``` r
 .First <- function(){
