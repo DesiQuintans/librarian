@@ -1,7 +1,7 @@
 # `librarian` - One-step packages from CRAN, GitHub, and Bioconductor
 
 ``` r
-librarian::shelf(dplyr, DesiQuintans/desiderata, zlibbioc)
+librarian::shelf(dplyr, DesiQuintans/desiderata, phyloseq)
                    ↑        ↑                      ↑
                   CRAN     GitHub                 Bioconductor
 
@@ -11,14 +11,14 @@ librarian::shelf(dplyr, DesiQuintans/desiderata, zlibbioc)
 `librarian` lets you quickly install, update, and attach packages from CRAN, GitHub, and Bioconductor in the same function call. It has these advantages over base R and other library management packages like `pacman`:
 
 - **It's one function.**  
-    - `shelf(dplyr, DesiQuintans/desiderata, zlibbioc)`  
+    - `shelf(dplyr, DesiQuintans/desiderata, phyloseq)`  
       **NOT**  
       `install.packages("dplyr")`  
       `devtools::install_github("DesiQuintans/desiderata")`  
-      `biocLite("zlibbioc")`
+      `biocLite("phyloseq")`  
       `library(dplyr)`  
-      `library(desiderata)`
-      `library(zlibbioc)`
+      `library(desiderata)`  
+      `library(phyloseq)`
 - **It has a consistent interface.**  
 It bothered me that `install.packages()` can install many packages, but `library()` can only attach one at a time. _librarian_ will install and attach them all.
 - **Packages are bare names.**  
@@ -28,63 +28,53 @@ When I was coming up with a naming scheme for this package and its functions, I 
 
 ## Installation
 
-You can install _librarian_ from CRAN or from GitHub. The GitHub version is under constant development, but it is stable for use.
+You can install _librarian_ from CRAN or from GitHub. The GitHub version is under constant development, but it has more features and it is stable for use (it's the one I personally use, after all).
+
+_Features that are currently **MISSING** from the CRAN release:_ BioConductor support via `shelf()` (v 1.4.0). Automatic library paths and package attaching at the start of an R session via `lib_startup()` (v 1.5.0).
 
 ``` r
-# From CRAN:
-
-install.packages("librarian")
-
 # From GitHub:
 
 install.packages("devtools")
 devtools::install_github("DesiQuintans/librarian")
+
+
+# From CRAN:
+
+install.packages("librarian")
 ```
 
-Once it's installed, you can either access the functions directly with `::` notation, or attach it with `library()`.
+Once it's installed, you can get librarian to automatically load at the start of every R session:
 
 ``` r
-# I prefer to use
+librarian::lib_startup(librarian, global = TRUE)
+```
 
+And you can also specify a library folder to install new packages into by default:
+
+``` r
+librarian::lib_startup(librarian, lib = "C:/Dropbox/My R Library", global = TRUE)
+```
+
+Or if you don't want to do that, you can attach it with `library(librarian)` or access the functions directly with `::` notation:
+
+``` r
 librarian::shelf(...)
 librarian::unshelf(...)
 librarian::reshelf(...)
-
-# But you can use
-
-library(librarian)
-
-shelf(...)
-unshelf(...)
-reshelf(...)
 ```
 
 ## Quick tour of _librarian_
 
 More in-depth documentation for each function is in the [Examples section](#examples) below.
 
-|      Function | Example                                  | Description                                                                        |
-| ------------: | :--------------------------------------- | :--------------------------------------------------------------------------------- |
-| `lib_paths()` | `lib_paths("C:/new_lib_folder")`         | View and edit the folders where R will install and search for packages.            |
-|     `shelf()` | `shelf(cowsay, DesiQuintans/desiderata)` | Attach packages to the search path, installing them from CRAN, Bioconductor, or GitHub if needed. They will be installed to the first folder in `lib_paths()`. |
-|   `unshelf()` | `unshelf(cowsay, desiderata)`            | Detach packages from the search path. You can also detach their dependencies.      |
-|   `reshelf()` | `reshelf(desiderata)`                    | Detach and then reattach packages, helpful for refreshing a personal package.      |
-
-
-## Setting a custom library location at the start of every R session
-
-If you want your custom library folder to be applied at the start of every R session, navigate to your R site profile (`R/R-3.x.x/etc/Rprofile.site`), open it in a text editor, and put this at the end of the file:
-
-``` r
-.First <- function(){
-    .libPaths("Path/to/library/folder")
-}
-```
-
-If R is installed outside the system's protected user folders, then this file should be editable without administrator rights.
-
-If you edit the site profile for every version of R you have installed, you can install a package once and then access it in all of your R versions (assuming the R version meets the packages' requirements, of course). I have my library on Dropbox so that I can use my packages at home, at work, and on my laptop and always know that it's the same version.
-
+| Function                 | Example                                    | Description                                                                                                                                                    |
+| ------------:            | :---------------------------------------   | :---------------------------------------------------------------------------------                                                                             |
+| `shelf()`                | `shelf(cowsay, DesiQuintans/desiderata)`   | Attach packages to the search path, installing them from CRAN, Bioconductor, or GitHub if needed. They will be installed to the first folder in `lib_paths()`. |
+| `unshelf()`              | `unshelf(cowsay, desiderata)`              | Detach packages from the search path. You can also detach their dependencies.                                                                                  |
+| `reshelf()`              | `reshelf(desiderata)`                      | Detach and then reattach packages, helpful for refreshing a personal package.                                                                                  |
+| `lib_paths()`            | `lib_paths("C:/new_lib_folder")`           | View and edit the folders where R will install and search for packages.                                                                                        |
+| `lib_startup()` | `lib_startup(librarian, forcats)` | Automatically attach libraries and packages at the start of every R session.                                                                                        |
 
 ## Examples
 
@@ -273,6 +263,29 @@ lib_paths(file.path(tempdir(), "newlibraryfolder"))
 #> [1] "C:/Users/.../Temp/Rtmp0Qbvgo/newlibraryfolder"
 #> [2] "C:/Users/.../Temp/Rtmp0Qbvgo/another_folder"
 #> [3] "D:/R/R-3.5.0/library"
+```
+
+---
+
+### lib_startup
+
+`lib_startup()` tells R to attach packages and library folders automatically at the start of every session.
+
+Note that this inherently messes with the reproducibility of your scripts; other people won't have your .Rprofile script, so they won't know what packages are being attached behind-the-scenes.
+
+
+
+`lib_startup()` lets you change the library paths (where R installs new packages, and where R looks to find existing ones) and the default packages (packages that are loaded when R starts) so that both of these changes are applied at the start of every session.
+
+`reshelf()` detaches and then reattaches packages. This is useful when you have a personal package, because you'll often find yourself adding a function to it and rebuilding it in one instance of RStudio, and then reloading the new build in a different RStudio instance that contains your actual work. Its return value is identical to `shelf()`.
+
+``` r
+reshelf(DesiQuintans/desiderata)
+
+# is identical to
+
+unshelf(DesiQuintans/desiderata, safe = FALSE, warn = FALSE))
+  shelf(DesiQuintans/desiderata)
 ```
 
 ---

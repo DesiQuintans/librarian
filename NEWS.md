@@ -1,3 +1,8 @@
+# librarian 1.5.0 (2018-11-02)
+
+- ADD - `lib_startup()` lets you set library search paths and packages that will be loaded globally at the start of every R session, or on a per-project basis.
+
+
 # librarian 1.4.0
 
 - ADD - `shelf()` now supports installing Bioconductor packages via `biocLite()`. Bioconductor's `Biobase` package needs to be installed before *librarian* will attempt to install Bioconductor packages.

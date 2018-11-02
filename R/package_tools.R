@@ -405,3 +405,113 @@ lib_paths <- function(path, make_path = TRUE, ask = TRUE) {
     
     return(.libPaths())
 }
+
+
+
+#' Set packages and library paths to automatically start-up with R
+#'
+#' This function writes code to a .Rprofile file that R reads at the start of every new 
+#' session.
+#'
+#' @param ... (Names) Packages as bare names. For packages that come from GitHub, you can
+#'    keep the username/package format, or omit the username and provide just the package 
+#'    name. If you leave `...` blank, R will only load its default packages (see Details).
+#' @param lib (Character) The path where packages are installed. Can be an 
+#'     absolute or relative path. If `path` has more than one element, only the first 
+#'     one will be kept. Tilde expansion is performed on the input, but wildcard expansion 
+#'     (globbing) is not. Defaults to the current library search path.
+#' @param global (Logical) If `TRUE`, write these settings to a .Rprofile file in the home
+#'    directory (on Windows, the My Documents folder). If `FALSE`, write them to a 
+#'    .Rprofile file that is in the current directory (i.e. the RStudio project's folder, 
+#'    or the current working directory). See Details for more.
+#'
+#' @details R's startup order is mentioned in `?Startup`, but briefly:
+#'    1. R tries to load the environmental variables file (Renviron.site)
+#'    2. R tries to load the site-wide profile (Rprofile.site)
+#'    3. R tries to load the user profile (.Rprofile), first in the current directory, and 
+#'       then in the user's home directory (on Windows, the My Documents folder). 
+#'       **Only one of these files is sourced into the workspace.**
+#'       
+#'    Omitting `...` makes R load only its default packages. If these are not set in an
+#'    environmental variable (`R_DEFAULT_PACKAGES`), then R will default to loading these 
+#'    packages: datasets, utils, grDevices, graphics, stats, and methods.
+#'
+#' @return A message listing the values that were written to the .Rprofile file.
+#' @export
+#'
+#' @examples
+#' \donttest{
+#' lib_startup(librarian)
+#' 
+#' lib_startup(librarian, dplyr, lubridate)
+#' }
+#' 
+#' @md
+lib_startup <- function(..., lib = lib_paths(), global = TRUE) {
+    # 1. Check that the library path folders exist.
+    paths <- lib_paths(lib, make_path = TRUE, ask = TRUE)
+        
+    # 2. Check if dots is empty or not.
+    if (backports:::...length() == 0) {
+        packages <- character(0)
+    } else {
+        packages <- nse_dots(..., keep_user = FALSE)
+    }
+
+    # 3. If dots is not empty, check that the packages are all installed.
+    if (length(packages) > 0) {
+        status <- check_installed(packages)
+        
+        if (any(!status)) { # !status so that the failed packages are TRUE.
+            # There was a package that was not installed in the search path.
+            stop("Some requested packages are not installed in the current library path:\n\n  ",
+                 paste(names(status[status == FALSE]), collapse = "  "), "\n\n",
+                 "  Use shelf() to install them, or if they are already installed, use\n", 
+                 "  the 'lib' argument to point to the folder they are installed in.")
+        }
+    }
+    
+    # 4. Reset the defaultPackages option.
+    def_pkgs <- Sys.getenv("R_DEFAULT_PACKAGES")
+    
+    if (nchar(def_pkgs) == 0) {
+        # This environment var is unset, so default to R's list of packages.
+        # See 'defaultPackages' entry in ?getOption for details.
+        def_pkgs <- c("datasets", "utils", "grDevices", "graphics", "stats", "methods")
+    }
+    
+    # 5. Build the lines that are going to be printed to the Rprofile.
+    libr_marker <- "  # Added by librarian::set_startup_packages()."
+    path_output <- collapse_vec(paths)
+    pkgs_output <- collapse_vec(def_pkgs, packages)
+    
+    path_lines <- paste0('\n.libPaths(c(', 
+                         path_output, 
+                         '))', 
+                         libr_marker)
+    
+    pkgs_lines <- paste0('\noptions(defaultPackages = c(', 
+                         pkgs_output, 
+                         '))', 
+                         libr_marker)
+
+    # 6. Check if the .Rprofile file already exists, and remove Librarian code from it.
+    file <- if (global == TRUE) "~/.Rprofile" else file.path(getwd(), ".Rprofile")
+
+    if (file.exists(file)) {
+        lines <- readLines(file)
+        lines <- lines[grepl(libr_marker, lines, fixed = TRUE) == FALSE]
+    } else {
+        lines <- character(0)
+    }
+
+    # 7. Print the lines to the file
+    cat(lines,      file = file, append = FALSE)  # Replace contents of file first.
+    cat(path_lines, file = file, append = TRUE)
+    cat(pkgs_lines, file = file, append = TRUE)
+    cat("\r\n",     file = file, append = TRUE)   # Terminate the file properly.
+
+    message("Added library paths and startup packages to:\n  ", path.expand(file), "\n\n",
+            "Library paths:\n  ", path_output, "\n\n",
+            "Startup packages:\n  ", pkgs_output)
+}
