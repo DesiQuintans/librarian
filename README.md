@@ -271,21 +271,18 @@ lib_paths(file.path(tempdir(), "newlibraryfolder"))
 
 `lib_startup()` tells R to attach packages and library folders automatically at the start of every session.
 
-Note that this inherently messes with the reproducibility of your scripts; other people won't have your .Rprofile script, so they won't know what packages are being attached behind-the-scenes.
+Note that this messes with the reproducibility of your scripts; other people won't have your .Rprofile script, so they won't know what packages are being attached behind-the-scenes. This is really just a convenience for you. You should still explicitly load the packages that you need in your analysis scripts. You can at least run `librarian:::check_attached()` to print out a list of the packages that are currently in use.
 
-
-
-`lib_startup()` lets you change the library paths (where R installs new packages, and where R looks to find existing ones) and the default packages (packages that are loaded when R starts) so that both of these changes are applied at the start of every session.
-
-`reshelf()` detaches and then reattaches packages. This is useful when you have a personal package, because you'll often find yourself adding a function to it and rebuilding it in one instance of RStudio, and then reloading the new build in a different RStudio instance that contains your actual work. Its return value is identical to `shelf()`.
+You can provide a list of packages that you would like to start with every R session. `lib_startup()` will add your current library folders as well as your current library paths (by default) to a file called `.Rprofile`. If `global = TRUE`, then `.Rprofile` will be created in your home folder and will be applied to every session. If `global = FALSE`, then `.Rprofile` will be created in the project folder (i.e. the current working directory) _and the global `.Rprofile` will be ignored for this project_.
 
 ``` r
-reshelf(DesiQuintans/desiderata)
+lib_startup(librarian, magrittr, global = TRUE)
+```
 
-# is identical to
+If `lib_startup()` is run without arguments, then it will reset your startup packages. If the environmental variable `R_DEFAULT_PACKAGES` is set then it will use those, otherwise it will default to R's own list: _datasets, utils, grDevices, graphics, stats,_ and _methods_.
 
-unshelf(DesiQuintans/desiderata, safe = FALSE, warn = FALSE))
-  shelf(DesiQuintans/desiderata)
+``` r
+lib_startup()
 ```
 
 ---
