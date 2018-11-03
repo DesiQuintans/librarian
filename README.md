@@ -271,18 +271,40 @@ lib_paths(file.path(tempdir(), "newlibraryfolder"))
 
 `lib_startup()` tells R to attach packages and library folders automatically at the start of every session.
 
-Note that this messes with the reproducibility of your scripts; other people won't have your .Rprofile script, so they won't know what packages are being attached behind-the-scenes. This is really just a convenience for you. You should still explicitly load the packages that you need in your analysis scripts. You can at least run `librarian:::check_attached()` to print out a list of the packages that are currently in use.
+**Note that this messes with the reproducibility of your scripts**; other people won't have your .Rprofile script, so they won't know what packages are being attached behind-the-scenes. This is really just a convenience for you. You should still explicitly load the packages that you need in your analysis scripts.
 
-You can provide a list of packages that you would like to start with every R session. `lib_startup()` will add your current library folders as well as your current library paths (by default) to a file called `.Rprofile`. If `global = TRUE`, then `.Rprofile` will be created in your home folder and will be applied to every session. If `global = FALSE`, then `.Rprofile` will be created in the project folder (i.e. the current working directory) _and the global `.Rprofile` will be ignored for this project_.
+You can provide a list of packages that you would like to start with every R session. `lib_startup()` will add your current library folders as well as your current library paths (by default) to a file called `.Rprofile`. 
+
+If `global = TRUE`, then `.Rprofile` will be created in your home folder and will be applied to every session. If `global = FALSE`, then `.Rprofile` will be created in the project folder (i.e. the current working directory) _and the global `.Rprofile` will be ignored for this project_.
 
 ``` r
 lib_startup(librarian, magrittr, global = TRUE)
+
+#> Added library paths and startup packages to:
+#>   C:/Users/.../Documents/.Rprofile
+#> 
+#> Library paths:
+#>   'D:/Dropbox/Apps/R library', 'D:/R/R-3.5.1/library'
+#> 
+#> Startup packages:
+#>   'datasets', 'utils', 'grDevices', 'graphics', 'stats', 'methods', 'librarian', 'magrittr'
 ```
 
-If `lib_startup()` is run without arguments, then it will reset your startup packages. If the environmental variable `R_DEFAULT_PACKAGES` is set then it will use those, otherwise it will default to R's own list: _datasets, utils, grDevices, graphics, stats,_ and _methods_.
+Notice that your packages are loaded after R's default packages. If the environmental variable `R_DEFAULT_PACKAGES` is set then it will use those packages, otherwise it will use R's own list of defaults: _datasets, utils, grDevices, graphics, stats,_ and _methods_. 
+
+If you want to load only the default packages, just run `lib_startup()` without specifying any packages.
 
 ``` r
 lib_startup()
+
+#> Added library paths and startup packages to:
+#>   C:/Users/.../Documents/.Rprofile
+#> 
+#> Library paths:
+#>   'D:/Dropbox/Apps/R library', 'D:/R/R-3.5.1/library'
+#> 
+#> Startup packages:
+#>   'datasets', 'utils', 'grDevices', 'graphics', 'stats', 'methods'
 ```
 
 ---
