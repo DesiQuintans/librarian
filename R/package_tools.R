@@ -161,6 +161,8 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
                 "    ", failed_install, "\n\n",
                 "  Are they Bioconductor packages? If so, please install Bioconductor\n",
                 "  before running librarian::shelf().\n",
+                "  Are they from GitHub? Please supply both the GitHub username and\n",
+                "  package name, e.g. DesiQuintans/librarian\n",
                 "  Otherwise, check the spelling and capitalisation of the names.")
     }
     
