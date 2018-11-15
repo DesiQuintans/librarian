@@ -33,6 +33,10 @@ nse_dots <- function(..., keep_user = FALSE) {
 
 #' Check installed packages
 #'
+#' This function behaves differently to the publicly-exposed librarian functions; because
+#' it is meant to be used inside librarian functions, it takes package names as a 
+#' character vector instead of as bare names. That's why I don't export it.
+#'
 #' @param packages (NULL or Character) 
 #'
 #' @return If `packages = NULL`, return a character vector of installed packages. If 
@@ -53,12 +57,12 @@ nse_dots <- function(..., keep_user = FALSE) {
 #' 
 #' @md
 check_installed <- function(packages = NULL) {
-    installed_pkgs <- rownames(utils::installed.packages())
-    
     if (is.null(packages)) {
-        return(installed_pkgs)
+        return(rownames(utils::installed.packages()))  # Very slow!
     } else {
-        status <- packages %in% installed_pkgs
+        found_pkgs <- find.package(packages, quiet = TRUE)
+        found_pkg_names <- gsub("^.*?(\\w+)$", "\\1", found_pkgs)  # Remove directory path
+        status <- packages %in% found_pkg_names
         names(status) <- packages
         
         return(status)
@@ -66,7 +70,12 @@ check_installed <- function(packages = NULL) {
 }
 
 
+
 #' Check attached packages
+#'
+#' This function behaves differently to the publicly-exposed librarian functions; because
+#' it is meant to be used inside librarian functions, it takes package names as a 
+#' character vector instead of as bare names. That's why I don't export it.
 #'
 #' @param packages (NULL or Character)
 #'
@@ -179,7 +188,7 @@ suppress_lib_message <- function(expr) {
 
 #' Collapse a vector 
 #'
-#' I use this internally for turning a vector of package names into a 
+#' I use this internally for turning a vector of package names into a string.
 #'
 #' @param ... (...) Vectors that will be concatenated and coerced to Character.
 #' @param wrap (Character) Placed at the left and right sides of each vector element.
