@@ -19,7 +19,7 @@ collapse_vec(..., wrap = "'", collapse = ", ", unique = TRUE)
 A string.
 }
 \description{
-I use this internally for turning a vector of package names into a
+I use this internally for turning a vector of package names into a string.
 }
 \examples{
 \dontrun{
