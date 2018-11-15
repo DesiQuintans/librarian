@@ -1,3 +1,7 @@
+# librarian 1.5.1 (2018-11-15)
+
+- MOD - `check_installed()` now works much faster, so librarian in general should work much faster because `check_installed()` was called in every function.
+
 # librarian 1.5.0 (2018-11-02)
 
 - ADD - `lib_startup()` lets you set library search paths and packages that will be loaded globally at the start of every R session, or on a per-project basis.
