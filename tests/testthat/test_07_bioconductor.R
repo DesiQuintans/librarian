@@ -1,7 +1,11 @@
 context("Installing packages from Bioconductor")
 
 library(librarian)
-librarian::lib_paths(tempdir())
+.libPaths(tempdir())  
+# Can't use librarian::lib_paths() because my personal .Rprofile sets a default library
+# path whenever R starts a new session, and Bioconductor is installed in that path. 
+# Because Biobase is already there, the 'install zlibbioc before Bioconductor is installed'
+# test fails. Using .libPaths() keeps only the default R library plus any new library.
 
 if (exists("biocLite") == FALSE) {
     suppressWarnings(
