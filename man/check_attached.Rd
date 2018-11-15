@@ -15,7 +15,9 @@ If \code{packages = NULL}, return a list of currently-attached packages. If
 vector showing if the packages are attached or not.
 }
 \description{
-Check attached packages
+This function behaves differently to the publicly-exposed librarian functions; because
+it is meant to be used inside librarian functions, it takes package names as a
+character vector instead of as bare names. That's why I don't export it.
 }
 \examples{
 \dontrun{
