@@ -483,7 +483,7 @@ lib_startup <- function(..., lib = lib_paths(), global = TRUE) {
     }
     
     # 5. Build the lines that are going to be printed to the Rprofile.
-    libr_marker <- "  # Added by librarian::set_startup_packages()."
+    libr_marker <- "  # Added by librarian::lib_startup()."
     path_output <- collapse_vec(paths)
     pkgs_output <- collapse_vec(def_pkgs, packages)
     

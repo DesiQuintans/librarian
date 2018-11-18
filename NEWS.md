@@ -1,3 +1,7 @@
+# librarian 1.5.2 (2018-11-19)
+
+- FIX - The code comment that `lib_startup()` uses to mark the lines it edited previously indicated an old function name.
+
 # librarian 1.5.1 (2018-11-15)
 
 - MOD - `check_installed()` now works much faster, so librarian in general should work much faster because `check_installed()` was called in every function.
