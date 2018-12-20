@@ -157,13 +157,15 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
     }
     
     if (length(failed_install) > 0) {
-        warning("These packages failed to install and were not attached:\n\n",
+        warning("\n\n  These packages failed to install and were not attached:\n\n",
                 "    ", paste(failed_install, collapse = ", "), "\n\n",
                 "  Are they Bioconductor packages? If so, please install Bioconductor\n",
-                "  before running librarian::shelf().\n",
+                "  before running librarian::shelf().\n\n",
                 "  Are they from GitHub? Please supply both the GitHub username and\n",
-                "  package name, e.g. DesiQuintans/librarian\n",
-                "  Otherwise, check the spelling and capitalisation of the names.")
+                "  package name, e.g. DesiQuintans/librarian\n\n",
+                "  Otherwise, check the spelling and capitalisation of the names.\n",
+                "  It's also possible that the packages are someone's private packages\n",
+                "  that are not being shared online.")
     }
     
     return(invisible(check_attached(nse_dots(..., keep_user = FALSE))))
