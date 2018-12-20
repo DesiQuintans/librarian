@@ -158,7 +158,7 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
     
     if (length(failed_install) > 0) {
         warning("These packages failed to install and were not attached:\n\n",
-                "    ", failed_install, "\n\n",
+                "    ", paste(failed_install, collapse = ", "), "\n\n",
                 "  Are they Bioconductor packages? If so, please install Bioconductor\n",
                 "  before running librarian::shelf().\n",
                 "  Are they from GitHub? Please supply both the GitHub username and\n",
