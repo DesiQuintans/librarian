@@ -1,3 +1,8 @@
+# librarian 1.5.3 (2019-01-24)
+
+- MOD - Less alarming and more informative message (not a warning) for when the `cran_repo` argument in `shelf()` contains the default R value `@CRAN@`. Closes [Issue #10](https://github.com/DesiQuintans/librarian/issues/10). Thanks, Jim Hunter!
+
+
 # librarian 1.5.2 (2018-11-19)
 
 - FIX - The code comment that `lib_startup()` uses to mark the lines it edited previously indicated an old function name.

@@ -81,8 +81,18 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
     
     if (any(cran_repo_is_url) == FALSE) {
         if (quiet == FALSE) {
-            warning("cran_repo = '", as.character(cran_repo), "' is not a valid URL. 
-                    Defaulting to cran_repo = 'https://cran.r-project.org'.")
+            if (cran_repo == "@CRAN@") {
+                # Special case for R's default CRAN placeholder value.
+                # See issue #10: https://github.com/DesiQuintans/librarian/issues/10
+                message("The 'cran_repo' argument in shelf() was not set, so it will \n",
+                        "use cran_repo = 'https://cran.r-project.org' by default.\n\n",
+                        "To avoid this message, set the 'cran_repo' argument to a\n",
+                        "CRAN mirror URL (see https://cran.r-project.org/mirrors.html)\n", 
+                        "or set 'quiet = TRUE'.")
+            } else {
+                warning("This is not a valid URL: cran_repo = '", as.character(cran_repo), "'\n", 
+                        "Defaulting to cran_repo = 'https://cran.r-project.org'.")
+            }
         }
         
         # Default to the official CRAN site because it's future-proof.
