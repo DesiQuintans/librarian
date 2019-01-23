@@ -82,7 +82,7 @@ More in-depth documentation for each function is in the [Examples section](#exam
 
 `shelf()` attaches packages to the search path, first installing them from CRAN, GitHub, or Bioconductor if needed.
 
-The order of package names does not matter.
+The order of package names is the order they will be attached to the current R session. 
 
 For CRAN packages, provide the package name as normal.
 For Bioconductor packages, provide the package name as normal **and make sure that Bioconductor's `Biobase` package is installed.**
