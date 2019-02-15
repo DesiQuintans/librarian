@@ -1,3 +1,9 @@
+# librarian 1.5.4 (2019-02-15)
+
+- FIX - The regular expression used in `librarian:::check_installed()` failed if the package name had a `.` inside it, so those packages were installable but not attachable with _librarian_. Closes [#12](https://github.com/DesiQuintans/librarian/issues/12).
+
+
+
 # librarian 1.5.3 (2019-01-24)
 
 - MOD - Less alarming and more informative message (not a warning) for when the `cran_repo` argument in `shelf()` contains the default R value `@CRAN@`. Closes [Issue #10](https://github.com/DesiQuintans/librarian/issues/10). Thanks, Jim Hunter!

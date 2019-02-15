@@ -61,7 +61,8 @@ check_installed <- function(packages = NULL) {
         return(rownames(utils::installed.packages()))  # Very slow!
     } else {
         found_pkgs <- find.package(packages, quiet = TRUE)
-        found_pkg_names <- gsub("^.*?(\\w+)$", "\\1", found_pkgs)  # Remove directory path
+        # Last directory of find.package() output is package folder.
+        found_pkg_names <- gsub("^.*?(/|\\\\)(.*?)$", "\\2", found_pkgs)
         status <- packages %in% found_pkg_names
         names(status) <- packages
         
