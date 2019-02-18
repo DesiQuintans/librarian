@@ -2,6 +2,7 @@
 
 - FIX - `nse_dots()` used to insert spaces in names that included `-` because it was formatting them nicely as if they were expressions with the minus operator. The function now removes any spaces that were created in the process of converting from a symbol to a string. Closes [#13](https://github.com/DesiQuintans/librarian/issues/13).
 - MOD - `remotes` replaces `devtools`. Closes [#11](https://github.com/DesiQuintans/librarian/issues/11).
+- REM - The `backports` package is no longer needed.
 
 
 # librarian 1.5.4 (2019-02-15)

@@ -13,7 +13,6 @@ Depends: R (>= 3.4.0)
 License: GPL-3
 Encoding: UTF-8
 Imports:
-    backports (>= 1.1.2),
     remotes (>= 2.0.0),
     tools (>= 3.4.0),
     utils (>= 3.4.0)

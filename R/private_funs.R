@@ -32,6 +32,31 @@ nse_dots <- function(..., keep_user = FALSE) {
 }
 
 
+
+#' Did the user pass arguments inside dots?
+#'
+#' @param ... (Dots)
+#'
+#' @return `TRUE` (dots is empty) or `FALSE` (dots is not empty).
+#'
+#' @examples
+#' \dontrun{
+#' is_dots_empty(package, names, here)
+#' 
+#' #> [1] FALSE  
+#' }
+#'
+#' @md
+is_dots_empty <- function(...) {
+    if (length(eval(substitute(alist(...)))) > 0) {
+        FALSE
+    } else {
+        TRUE
+    }
+}
+
+
+
 #' Check installed packages
 #'
 #' This function behaves differently to the publicly-exposed librarian functions; because

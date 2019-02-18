@@ -58,7 +58,7 @@
 #' @md
 shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask = TRUE, 
                   cran_repo = getOption("repos"), bioc_repo = character()) {
-    if (backports:::...length() == 0) {
+    if (is_dots_empty(...) == TRUE) {
         # Errors should not be 'quiet'-able.
         stop("No packages were chosen for attaching.")
     }
@@ -99,7 +99,7 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
         cran_repo <- "https://cran.r-project.org"
     }
     
-    # 1. Get dots (which contains the requested package names)
+    # 1. Get dots (which contains the requested package names).
     packages <- nse_dots(..., keep_user = TRUE)
 
     # 2. Separate the GitHub packages from the CRAN ones. They'll contain a forward-slash.
@@ -225,7 +225,9 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
 #' 
 #' @md
 unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, quiet = TRUE) {
-    if (backports:::...length() == 0 && everything == FALSE) {
+    
+    
+    if (is_dots_empty(...) == TRUE && everything == FALSE) {
         # Errors should not be 'quiet'-able.
         stop("No packages were chosen for detaching. Either provide the names of ", 
              "packages, or set 'everything = TRUE' to detach all non-Base packages.")
@@ -466,7 +468,7 @@ lib_startup <- function(..., lib = lib_paths(), global = TRUE) {
     paths <- lib_paths(lib, make_path = TRUE, ask = TRUE)
         
     # 2. Check if dots is empty or not.
-    if (backports:::...length() == 0) {
+    if (is_dots_empty(...) == TRUE) {
         packages <- character(0)
     } else {
         packages <- nse_dots(..., keep_user = FALSE)
