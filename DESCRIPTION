@@ -20,3 +20,4 @@ Imports:
 LazyData: true
 RoxygenNote: 6.1.1
 Suggests: testthat
+Language: en-GB

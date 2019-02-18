@@ -24,7 +24,7 @@ It bothered me that `install.packages()` can install many packages, but `library
 - **Packages are bare names.**  
 Miss me with those quoted names, they're such a hassle! _librarian_ uses bare names so that it's easier to maintain a package list. If you're trying a different analysis and you need a new package, just add it to the list and it will download and attach with a few keystrokes.
 
-When I was coming up with a naming scheme for this package and its functions, I had this idea that very big libraries (or indeed, networks of libraries within your city/state/country) can have so many books that they can't all fit on the public shelves. Librarians need to decide what is useful enough to warrant shelf space, and what can just stay in storage for now. So _librarian_ takes packages out of storage and puts them on the `shelf()` (the search path), and then lets you `unshelf()` them when they're not needed anymore.
+When I was coming up with a naming scheme for this package and its functions, I had this idea that very big libraries (or indeed, networks of libraries within your city/state/country) can have so many books that they can't all fit on the public shelves. Librarians need to decide what is useful enough to warrant shelf space, and what can just stay in storage for now. So _librarian_ takes packages out of storage and puts them on the `shelf()` (the search path), and then lets you `unshelf()` them when they're no longer needed..
 
 ## Installation
 
@@ -112,7 +112,7 @@ To force all of the named packages to re-download and re-install, use `update_al
 
 Note that this only updates the named packages and not their dependencies. To update dependencies also, run `devtools::update_packages(c("pkg1", "pkg2", ...))`. _As usual, be careful when updating packages; your old scripts might need to be updated if packages have changed their function behaviours._
 
-If you specify a new `lib` and use the argument `update_all = TRUE` to force an already-installed package to reinstall, a new copy of that package will be made in `lib` and then loaded from there. This means that you can potentially have several copies of the same package across many folders on your machine, each a different version. This allows you to maintain a different library folder for different projects, so that updated packages in Project B wil not affect the package versions you rely on for Project A.
+If you specify a new `lib` and use the argument `update_all = TRUE` to force an already-installed package to reinstall, a new copy of that package will be made in `lib` and then loaded from there. This means that you can potentially have several copies of the same package across many folders on your machine, each a different version. This allows you to maintain a different library folder for different projects, so that updated packages in Project B will not affect the package versions you rely on for Project A.
 
 ``` r
 shelf(dplyr, DesiQuintans/desiderata, purrr, update_all = TRUE)
