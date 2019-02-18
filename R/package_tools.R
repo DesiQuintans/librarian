@@ -129,7 +129,7 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
     
     if (length(github_missing) > 0) {
         suppress_lib_message(
-            devtools::install_github(github_missing, quiet = quiet)
+            remotes::install_github(github_missing, quiet = quiet)
         )
     }
     
