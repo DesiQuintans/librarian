@@ -1,26 +1,29 @@
 context("Installing packages from Bioconductor")
 
 library(librarian)
-.libPaths(tempdir())  
-# Can't use librarian::lib_paths() because my personal .Rprofile sets a default library
-# path whenever R starts a new session, and Bioconductor is installed in that path. 
-# Because Biobase is already there, the 'install zlibbioc before Bioconductor is installed'
-# test fails. Using .libPaths() keeps only the default R library plus any new library.
 
-if (exists("biocLite") == FALSE) {
-    suppressWarnings(
-        suppressMessages(
-            source("https://bioconductor.org/biocLite.R", echo = FALSE, verbose = FALSE)
-        )
-    )
-}
+suppressMessages(library(BiocManager))
+
+.libPaths(tempdir())
+
+# I change libpaths immediately after loading those packages because one of the tests
+# below requires that Biobase is not installed to begin with (and it may be installed
+# in my personal library). Using .libPaths() keeps only the default R library plus 
+# any newly installed libraries.
+
+
 
 test_that("Check zlibbioc (Bioconductor) install before Bioconductor is installed.", {
     skip_on_cran()
     expect_warning(shelf(zlibbioc, lib = tempdir(), quiet = TRUE, update_all = TRUE), "Are they Bioconductor")
 })
 
-biocLite("Biobase", suppressUpdates = TRUE, lib = tempdir())
+# suppressWarnings() because for some reason, this raises two errors:
+# cannot open URL 'https://bioconductor.org/packages/3.8/workflows/bin/windows/contrib/3.5/PACKAGES.rds': HTTP status was '404 Not Found'
+# It only happens when devtools::test() runs it, it doesn't happen when I run the 
+# block in my terminal.
+suppressMessages(
+    suppressWarnings(BiocManager::install("Biobase", ask = FALSE, update = FALSE, quiet = TRUE)))
 
 test_that("Check zlibbioc (Bioconductor) install after Bioconductor is installed.", {
     skip_on_cran()
