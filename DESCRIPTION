@@ -1,6 +1,6 @@
 Package: librarian
 Title: Install, Update, Load Packages from CRAN, 'GitHub', and 'Bioconductor' in One Step
-Version: 1.5.6
+Version: 1.6.0
 Date: 2019-02-18
 Authors@R: person("Desi", "Quintans", email = "science@desiquintans.com",
                   role = c("aut", "cre"))
@@ -13,6 +13,7 @@ Depends: R (>= 3.4.0)
 License: GPL-3
 Encoding: UTF-8
 Imports:
+    BiocManager (>= 1.29.40),
     remotes (>= 2.0.0),
     tools (>= 3.4.0),
     utils (>= 3.4.0)
