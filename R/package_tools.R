@@ -137,22 +137,13 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
     cran_still_missing <- cran_missing[which(!check_installed(cran_missing))]
     
     if (length(cran_still_missing) > 0 & check_installed("Biobase") == TRUE) {
-        if (exists("biocLite") == FALSE) {
-            suppressWarnings(
-                suppressMessages(
-                    source("https://bioconductor.org/biocLite.R", echo = FALSE, verbose = FALSE)
-                )
-            )
-        }
-        
-        suppressMessages(
-            suppressWarnings(
-                # By my understanding, biocLite with `suppressUpdates = TRUE` will
-                # automatically update the requested Bioconductor packages, but will NOT
-                # update all other installed packages too. I tried running it with
-                # `ask = FALSE` and it updated everything in my R installation :/
-                biocLite(cran_still_missing, suppressUpdates = TRUE, siteRepos = bioc_repo, quiet = quiet)
-            )
+        eval_quietly(
+            # By my understanding, install with `suppressUpdates = TRUE` will
+            # automatically update the requested Bioconductor packages, but will NOT
+            # update all other installed packages too. I tried running it with
+            # `ask = FALSE` and it updated everything in my R installation :/
+            BiocManager::install(cran_still_missing, site_repository = bioc_repo,
+                                 update = FALSE, ask = FALSE, quiet = quiet)
         )
     }
     
