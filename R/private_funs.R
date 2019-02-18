@@ -20,6 +20,7 @@
 nse_dots <- function(..., keep_user = FALSE) {
     dots <- eval(substitute(alist(...)))
     dots <- as.character(dots)
+    dots <- gsub("\\s", "", dots)
     
     if (keep_user == FALSE) {
         dots <- sub(".*?/", "", dots)

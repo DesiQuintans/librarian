@@ -1,3 +1,9 @@
+# librarian 1.5.5 (2019-02-18)
+
+- FIX - `nse_dots()` used to insert spaces in names that included `-` because it was formatting them nicely as if they were expressions with the minus operator. The function now removes any spaces that were created in the process of converting from a symbol to a string. Closes [#13](https://github.com/DesiQuintans/librarian/issues/13).
+
+
+
 # librarian 1.5.4 (2019-02-15)
 
 - FIX - The regular expression used in `librarian:::check_installed()` failed if the package name had a `.` inside it, so those packages were installable but not attachable with _librarian_. Closes [#12](https://github.com/DesiQuintans/librarian/issues/12).
