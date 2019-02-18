@@ -213,6 +213,21 @@ suppress_lib_message <- function(expr) {
 
 
 
+#' Suppress warnings/messages/package startup messages
+#'
+#' @param expr An expression.
+#'
+#' @return Evaluate `expr` but suppress warnings/messages/package startup messages.
+#'
+#' @md
+eval_quietly <- function(expr) {
+    suppressPackageStartupMessages(
+        suppressMessages(expr)
+    )
+}
+
+
+
 #' Collapse a vector 
 #'
 #' I use this internally for turning a vector of package names into a string.

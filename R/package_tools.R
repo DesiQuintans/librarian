@@ -273,7 +273,7 @@ unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, 
     to_detach_prefixed <- sub("^", "package:", to_detach)
     
     if (length(to_detach_prefixed) > 0) {
-        suppressWarnings(
+        eval_quietly(
             lapply(to_detach_prefixed, detach, unload = TRUE, character.only = TRUE)
         )
     }
