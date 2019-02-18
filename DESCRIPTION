@@ -13,6 +13,7 @@ Depends: R (>= 3.4.0)
 License: GPL-3
 Encoding: UTF-8
 Imports:
+    BiocManager (>= 1.29.40),
     remotes (>= 2.0.0),
     tools (>= 3.4.0),
     utils (>= 3.4.0)
