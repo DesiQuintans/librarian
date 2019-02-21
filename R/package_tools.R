@@ -584,6 +584,11 @@ browse_cran <- function(query, fuzzy = FALSE, echo = TRUE, ignore.case = TRUE) {
     matching_rows <- grep(query, cran_db[["Haystack"]], 
                           ignore.case = ignore.case, perl = TRUE)
     
+    if (length(matching_rows) == 0) {
+        message("\nNo CRAN packages matched query: ", query, "\n")
+        return(invisible(data.frame()))
+    }
+    
     # Remember to omit the "haystack" col.
     matches <- cran_db[matching_rows, c("Package", "Description")]
     

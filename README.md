@@ -30,7 +30,7 @@ When I was coming up with a naming scheme for this package and its functions, I 
 
 You can install _librarian_ from CRAN or from GitHub. The GitHub version is under constant development, but it has more features and it is stable for use (it's the one I personally use, after all).
 
-_Features that are currently **MISSING** from the CRAN release:_ BioConductor support via `shelf()` (v 1.4.0). Automatic library paths and package attaching at the start of an R session via `lib_startup()` (v 1.5.0).
+_Features that are currently **MISSING** from the CRAN release:_ BioConductor support via `shelf()` (v 1.4.0). Automatic library paths and package attaching at the start of an R session via `lib_startup()` (v 1.5.0). Package discovery via `browse_cran()` (v 1.6.0).
 
 ``` r
 # From GitHub:
@@ -68,13 +68,14 @@ librarian::reshelf(...)
 
 More in-depth documentation for each function is in the [Examples section](#examples) below.
 
-| Function                 | Example                                    | Description                                                                                                                                                    |
-| ------------:            | :---------------------------------------   | :---------------------------------------------------------------------------------                                                                             |
-| `shelf()`                | `shelf(cowsay, DesiQuintans/desiderata)`   | Attach packages to the search path, installing them from CRAN, Bioconductor, or GitHub if needed. They will be installed to the first folder in `lib_paths()`. |
-| `unshelf()`              | `unshelf(cowsay, desiderata)`              | Detach packages from the search path. You can also detach their dependencies.                                                                                  |
-| `reshelf()`              | `reshelf(desiderata)`                      | Detach and then reattach packages, helpful for refreshing a personal package.                                                                                  |
-| `lib_paths()`            | `lib_paths("C:/new_lib_folder")`           | View and edit the folders where R will install and search for packages.                                                                                        |
-| `lib_startup()` | `lib_startup(librarian, forcats)` | Automatically attach libraries and packages at the start of every R session.                                                                                        |
+| Function        | Example                                  | Description                                                                                                                                                    |
+| ------------:   | :--------------------------------------- | :---------------------------------------------------------------------------------                                                                             |
+| `shelf()`       | `shelf(cowsay, DesiQuintans/desiderata)` | Attach packages to the search path, installing them from CRAN, Bioconductor, or GitHub if needed. They will be installed to the first folder in `lib_paths()`. |
+| `unshelf()`     | `unshelf(cowsay, desiderata)`            | Detach packages from the search path. You can also detach their dependencies.                                                                                  |
+| `reshelf()`     | `reshelf(desiderata)`                    | Detach and then reattach packages, helpful for refreshing a personal package.                                                                                  |
+| `lib_paths()`   | `lib_paths("C:/new_lib_folder")`         | View and edit the folders where R will install and search for packages.                                                                                        |
+| `lib_startup()` | `lib_startup(librarian, forcats)`        | Automatically attach libraries and packages at the start of every R session.                                                                                   |
+| `browse_cran()` | `browse_cran("linear regression")`       | Discover CRAN packages by keyword or regular expression.                                                                                                       |
 
 ## Examples
 
@@ -306,6 +307,47 @@ lib_startup()
 #> Startup packages:
 #>   'datasets', 'utils', 'grDevices', 'graphics', 'stats', 'methods'
 ```
+
+---
+
+### browse_cran
+
+`browse_cran()` lets you discover CRAN packages from your terminal.
+
+    browse_cran("colorbrewer")
+    
+    #> RColorBrewer 
+    #>     Provides color schemes for maps (and other graphics) designed by Cynthia 
+    #>     Brewer as described at http://colorbrewer2.org 
+    #> 
+    #> Redmonder 
+    #>     Provide color schemes for maps (and other graphics) based on the color 
+    #>     palettes of several Microsoft(r) products. Forked from 'RColorBrewer' 
+    #>     v1.1-2.
+    
+You can search with keywords or with regular expressions.
+
+    browse_cran("zero-inflat.*?abund", fuzzy = FALSE)
+    
+    #> hurdlr 
+    #>     When considering count data, it is often the case that many more zero 
+    #>     counts than would be expected of some given distribution are observed. It 
+    #>     is well established that data such as this can be reliab[...] 
+
+You can also do **fuzzy orderless matching**, it's a little slow but it will get you results on tricky searches:
+
+    browse_cran("network.*?api.*?twitter", fuzzy = FALSE)
+
+    #> No CRAN packages matched query: 'network.*?api.*?twitter'.
+
+    browse_cran("network twitter api", fuzzy = TRUE)
+
+    #> RKlout 
+    #>     An interface of R to Klout API v2. It fetches Klout Score for a Twitter 
+    #>     Username/handle in real time. Klout is a website and mobile app that uses 
+    #>     social media analytics to rank its users according to [...] 
+
+
 
 ---
 

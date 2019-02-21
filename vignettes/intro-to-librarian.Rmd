@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 # _Librarian_ is a better interface for installing and attaching packages
 
-_Librarian_ helps you install and use packages without interrupting your train of thought by merging CRAN, GitHub, and Bioconductor support into one consistent interface. Installing and loading packages from these different repositories can be done with:
+_Librarian_ merges CRAN, GitHub, and Bioconductor package installation and management into one consistent interface, which means that you can deal with packages in your code without breaking your train of thought. Installing and attaching packages from these different repositories can be done with:
 
     shelf(dplyr, DesiQuintans/desiderata, phyloseq)
 
@@ -31,15 +31,17 @@ Instead of having to deal with this:
     library(desiderata)
     library(phyloseq)
     
-_Librarian_ installs packages that aren't on your computer yet, which makes it fast and easy to try out new packages; just add them to the `shelf()` call. And since _Librarian_ handles package installation for you, you won't have to uncomment those package installation lines or wrap them in an `if` to prevent them from installing more than once.
+_Librarian_ makes it fast and easy to try out new packages; just add them to the `shelf()` call. Since _Librarian_ handles package installation for you, you won't have to uncomment those package installation lines or wrap them in an `if` to prevent them from installing more than once.
 
 _Librarian_ also presents a consistent user interface. The core functions `shelf`, `unshelf`, and `reshelf` all accept multiple package entries, provided as a comma-separated list of unquoted names. This means no maintaining `""` around package names, no inconsistency around whether a function will accept names or whether it needs strings, and no inconsistency around whether you can provide a list of packages to a function or whether the function will only accept a single item at a time.
+
+Finally, _Librarian_ comes with tools for loading packages at the start of every session, managing your library folder locations, and discovering new packages on CRAN by searching with keywords or regular expressions.
 
 
 
 # Getting _Librarian_
 
-You can install librarian from CRAN or from GitHub. The GitHub version is under constant development, but it has more features and it is stable for use (it's the one I personally use, after all).
+You can install librarian from CRAN or from GitHub. The GitHub version is under constant development, but it has more features and it is stable for daily use (it's the one this author personally uses, after all).
 
     # From GitHub:
     
@@ -106,7 +108,7 @@ GitHub packages are provided as `UserName/RepoName`.
     
 You can install all three in the same `shelf()` call.
 
-You can force packages to reinstall with the `update_all` argument.
+You can force all listed packages to reinstall with the `update_all` argument.
 
     shelf(cowsay, DesiQuintans/emptyRpackage, phyloseq, update_all = TRUE)
 
@@ -125,7 +127,7 @@ You can unattach packages by themselves or with their dependencies.
     # dplyr, tidyr, and all of their dependencies unconditionally
     unshelf(dplyr, tidyr, also_depends = TRUE, safe = FALSE)
     
-There is a shortcut for unattaching and reattaching packages (you want to reload the new build of your personal package, for example).
+There is a shortcut for unattaching and reattaching packages (for example, if you want to reload the new build of your personal package).
 
     reshelf(DesiQuintans/desiderata)
 
@@ -145,6 +147,49 @@ Use `lib_paths()` to interact with your library locations.
     
     #> [1] "C:/Dropbox/My New R Library"            "C:/Dropbox/My R Library             
     #> [3] "C:/DesiPrograms/R/R-3.5.2/library"   
+
+
+
+# Package discovery on CRAN
+
+Use `browse_cran()` to search package names and descriptions. For example, maybe you can't remember what the "colorbrewer" package is actually called.
+
+    browse_cran("colorbrewer")
+    
+    #> RColorBrewer 
+    #>     Provides color schemes for maps (and other graphics) designed by Cynthia 
+    #>     Brewer as described at http://colorbrewer2.org 
+    #> 
+    #> Redmonder 
+    #>     Provide color schemes for maps (and other graphics) based on the color 
+    #>     palettes of several Microsoft(r) products. Forked from 'RColorBrewer' 
+    #>     v1.1-2.
+    
+Or maybe you're looking for packages that can help you with a particular task, like using a zero-inflated statistical model on abundance data.
+
+    browse_cran("zero-inflat.*?abund", fuzzy = FALSE)
+    
+    #> hurdlr 
+    #>     When considering count data, it is often the case that many more zero 
+    #>     counts than would be expected of some given distribution are observed. It 
+    #>     is well established that data such as this can be reliab[...] 
+
+(PS. I genuinely didn't know about this package until I contrived this example for the vignette, but it looks like it would be perfect for my work :O)
+
+You can also do **fuzzy orderless matching**, it's a little slow but it will get you results on tricky searches:
+
+    browse_cran("network.*?api.*?twitter", fuzzy = FALSE)
+
+    #> No CRAN packages matched query: 'network.*?api.*?twitter'.
+
+    browse_cran("network twitter api", fuzzy = TRUE)
+
+    #> RKlout 
+    #>     An interface of R to Klout API v2. It fetches Klout Score for a Twitter 
+    #>     Username/handle in real time. Klout is a website and mobile app that uses 
+    #>     social media analytics to rank its users according to [...] 
+    
+(Note that in the non-fuzzy example, the search returns no hits because it's trying to find "network" and "api" and "twitter" in that order, but the fuzzy search was able to match them out-of-order.)
 
 
 
