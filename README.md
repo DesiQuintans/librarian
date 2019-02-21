@@ -8,23 +8,38 @@ librarian::shelf(dplyr, DesiQuintans/desiderata, phyloseq)
 # All downloaded, installed, and attached.
 ```
 
-`librarian` lets you quickly install, update, and attach packages from CRAN, GitHub, and Bioconductor in the same function call. It has these advantages over base R and other library management packages like `pacman`:
+`librarian` lets you quickly install, update, and attach packages from CRAN, GitHub, and Bioconductor in one function call. It has these advantages over base R and other library management packages like `pacman`:
 
-- **It's one function.**  
-    - `shelf(dplyr, DesiQuintans/desiderata, phyloseq)`  
-      **NOT**  
-      `install.packages("dplyr")`  
-      `devtools::install_github("DesiQuintans/desiderata")`  
-      `biocLite("phyloseq")`  
-      `library(dplyr)`  
-      `library(desiderata)`  
-      `library(phyloseq)`
-- **It has a consistent interface.**  
-It bothered me that `install.packages()` can install many packages, but `library()` can only attach one at a time. _librarian_ will install and attach them all.
-- **Packages are bare names.**  
-Miss me with those quoted names, they're such a hassle! _librarian_ uses bare names so that it's easier to maintain a package list. If you're trying a different analysis and you need a new package, just add it to the list and it will download and attach with a few keystrokes.
+### Advantage 1: _Librarian_ installs and attaches in one function call
 
-When I was coming up with a naming scheme for this package and its functions, I had this idea that very big libraries (or indeed, networks of libraries within your city/state/country) can have so many books that they can't all fit on the public shelves. Librarians need to decide what is useful enough to warrant shelf space, and what has to stay in storage for now. So _librarian_ takes packages out of storage and puts them on the `shelf()` (the search path), and then lets you `unshelf()` them when they're no longer needed.
+    shelf(dplyr, DesiQuintans/desiderata, phyloseq)
+    
+Is a lot nicer than:
+
+    install.packages("dplyr")
+    remotes::install_github("DesiQuintans/desiderata")
+    biocLite("phyloseq")
+    library(dplyr)
+    library(desiderata)
+    library(phyloseq)
+
+### Advantage 2: _Librarian_ has a consistent interface
+
+It bothered me that `install.packages()` can install many packages, but `library()` can only attach one at a time. It bothered me that `install.packages()` needs a character vector, but `library()` can accept either a character vector or a bare name.
+
+Core _librarian_ functions (`shelf`, `reshelf`, `unshelf`) always accept a list of one or more bare names.
+
+### Advantage 3: _Librarian_'s package lists are easy to read and easy to maintain
+
+Using bare names instead of strings frees you from typing quotes all the time. Having all of your packages in one `shelf()` call means that the reader can get an overview of your package dependencies at a glance.
+
+> We don’t want to clutter up the tops of our modules with 80 lines of imports. 
+> Rather we want the imports to be a concise statement about which packages we 
+> collaborate with.
+> 
+> --- Robert C. Martin, _Clean Code_
+
+
 
 ## Installation
 
@@ -35,8 +50,8 @@ _Features that are currently **MISSING** from the CRAN release:_ BioConductor su
 ``` r
 # From GitHub:
 
-install.packages("devtools")
-devtools::install_github("DesiQuintans/librarian")
+install.packages("remotes")
+remotes::install_github("DesiQuintans/librarian")
 
 
 # From CRAN:
@@ -66,6 +81,8 @@ librarian::reshelf(...)
 
 ## Quick tour of _librarian_
 
+The metaphor behind function names is one of a very large public library that has more books than public shelf space. The librarian needs to decide what books are useful enough to warrant display, and which books should stay in storage for now. You take packages out of storage and put them on the `shelf()` (the search path) when you need them, and then `unshelf()` them when you don't need them.
+
 More in-depth documentation for each function is in the [Examples section](#examples) below.
 
 | Function        | Example                                  | Description                                                                                                                                                    |
@@ -75,7 +92,7 @@ More in-depth documentation for each function is in the [Examples section](#exam
 | `reshelf()`     | `reshelf(desiderata)`                    | Detach and then reattach packages, helpful for refreshing a personal package.                                                                                  |
 | `lib_paths()`   | `lib_paths("C:/new_lib_folder")`         | View and edit the folders where R will install and search for packages.                                                                                        |
 | `lib_startup()` | `lib_startup(librarian, forcats)`        | Automatically attach libraries and packages at the start of every R session.                                                                                   |
-| `browse_cran()` | `browse_cran("linear regression")`       | Discover CRAN packages by keyword or regular expression.                                                                                                       |
+| `browse_cran()` | `browse_cran("linear regression")`       | Discover CRAN packages by keyword search or regular expression.                                                                                                |
 
 ## Examples
 
