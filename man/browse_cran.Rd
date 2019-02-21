@@ -28,6 +28,7 @@ Inspired by my mysterious inability to remember what the ColorBrewer package is
 actually called.
 }
 \examples{
+\donttest{
 browse_cran("colorbrewer")
 
 #> RColorBrewer 
@@ -38,5 +39,6 @@ browse_cran("colorbrewer")
 #>     Provide color schemes for maps (and other graphics) based on the color 
 #>     palettes of several Microsoft(r) products. Forked from 'RColorBrewer' 
 #>     v1.1-2. 
+}
 
 }

@@ -540,6 +540,7 @@ lib_startup <- function(..., lib = lib_paths(), global = TRUE) {
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' browse_cran("colorbrewer")
 #' 
 #' #> RColorBrewer 
@@ -550,6 +551,7 @@ lib_startup <- function(..., lib = lib_paths(), global = TRUE) {
 #' #>     Provide color schemes for maps (and other graphics) based on the color 
 #' #>     palettes of several Microsoft(r) products. Forked from 'RColorBrewer' 
 #' #>     v1.1-2. 
+#' }
 #' 
 #' @md
 browse_cran <- function(query, fuzzy = FALSE, echo = TRUE, ignore.case = TRUE) {
