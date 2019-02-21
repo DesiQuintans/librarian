@@ -9,14 +9,14 @@ Description: Automatically install, update, and load 'CRAN', 'GitHub', and 'Bioc
     it's easy to add or remove packages from the list.
 URL: https://github.com/DesiQuintans/librarian
 BugReports: https://github.com/DesiQuintans/librarian/issues
-Depends: R (>= 3.4.0)
+Depends: R (>= 3.5.0)
 License: GPL-3
 Encoding: UTF-8
 Imports:
     BiocManager (>= 1.29.40),
     remotes (>= 2.0.0),
-    tools (>= 3.4.0),
-    utils (>= 3.4.0)
+    tools (>= 3.5.0),
+    utils (>= 3.5.0)
 LazyData: true
 RoxygenNote: 6.1.1
 Suggests: testthat

@@ -1,3 +1,12 @@
+# librarian 1.6.0 (2019-02-19)
+
+- MOD - `biocLite` has been replaced with `BiocManager` for installing Bioconductor packages. `BiocManager` has been added as a dependency.
+- FIX - Various spelling errors in preparation for CRAN submission.
+- ADD - Vignette for CRAN
+- ADD - `browse_cran()` for searching CRAN package titles and descriptions by keyword or regular expression.
+
+
+
 # librarian 1.5.5 (2019-02-18)
 
 - FIX - `nse_dots()` used to insert spaces in names that included `-` because it was formatting them nicely as if they were expressions with the minus operator. The function now removes any spaces that were created in the process of converting from a symbol to a string. Closes [#13](https://github.com/DesiQuintans/librarian/issues/13).
