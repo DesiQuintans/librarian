@@ -24,7 +24,7 @@ It bothered me that `install.packages()` can install many packages, but `library
 - **Packages are bare names.**  
 Miss me with those quoted names, they're such a hassle! _librarian_ uses bare names so that it's easier to maintain a package list. If you're trying a different analysis and you need a new package, just add it to the list and it will download and attach with a few keystrokes.
 
-When I was coming up with a naming scheme for this package and its functions, I had this idea that very big libraries (or indeed, networks of libraries within your city/state/country) can have so many books that they can't all fit on the public shelves. Librarians need to decide what is useful enough to warrant shelf space, and what can just stay in storage for now. So _librarian_ takes packages out of storage and puts them on the `shelf()` (the search path), and then lets you `unshelf()` them when they're no longer needed..
+When I was coming up with a naming scheme for this package and its functions, I had this idea that very big libraries (or indeed, networks of libraries within your city/state/country) can have so many books that they can't all fit on the public shelves. Librarians need to decide what is useful enough to warrant shelf space, and what has to stay in storage for now. So _librarian_ takes packages out of storage and puts them on the `shelf()` (the search path), and then lets you `unshelf()` them when they're no longer needed.
 
 ## Installation
 
