@@ -74,12 +74,8 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
     # in R.exe running in the shell, I get the named vector c("CRAN" = "@CRAN@"), which is
     # probably what was causing the error. To catch this, I'll test whether cran_repo is 
     # a URL.
-    
-    # Regex is "@stephenhay" from https://mathiasbynens.be/demo/url-regex because it's the 
-    # shortest regex that matches every CRAN mirror at https://cran.r-project.org/mirrors.html
-    cran_repo_is_url <- grepl("(https?|ftp)://[^\\s/$.?#].[^\\s]*", cran_repo)
-    
-    if (any(cran_repo_is_url) == FALSE) {
+
+    if (is_valid_url(cran_repo) == FALSE) {
         if (quiet == FALSE) {
             if (cran_repo == "@CRAN@") {
                 # Special case for R's default CRAN placeholder value.
@@ -137,7 +133,6 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
     cran_still_missing <- cran_missing[which(!check_installed(cran_missing))]
     
     if (length(cran_still_missing) > 0 & check_installed("Biobase") == TRUE) {
-        # eval_quietly(
         suppressWarnings(
             # By my understanding, install with `suppressUpdates = TRUE` will
             # automatically update the requested Bioconductor packages, but will NOT
@@ -156,8 +151,8 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
     # 6. Attach those packages.
     if (length(not_attached) > 0) {
         # Bioconductor packages have SO MANY annoying package startup messages that 
-        # are actually just sent as plain messages.
-            lapply(not_attached, library, character.only = TRUE, quietly = quiet)
+        # are actually just sent as plain messages. Should I suppress them?
+        lapply(not_attached, library, character.only = TRUE, quietly = quiet)
     }
     
     if (length(failed_install) > 0) {
@@ -219,8 +214,6 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
 #' 
 #' @md
 unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, quiet = TRUE) {
-    
-    
     if (is_dots_empty(...) == TRUE && everything == FALSE) {
         # Errors should not be 'quiet'-able.
         stop("No packages were chosen for detaching. Either provide the names of ", 
@@ -524,4 +517,80 @@ lib_startup <- function(..., lib = lib_paths(), global = TRUE) {
     message("Added library paths and startup packages to:\n  ", path.expand(file), "\n\n",
             "Library paths:\n  ", path_output, "\n\n",
             "Startup packages:\n  ", pkgs_output)
+}
+
+
+
+#' Search for CRAN packages by keyword/regex
+#'
+#' Inspired by my mysterious inability to remember what the ColorBrewer package is 
+#' actually called.
+#'
+#' @param query (Character) A string to `grep()` for.
+#' @param fuzzy (Logical) If `TRUE`, enables fuzzy orderless matching. Every word in
+#'   `query` (i.e. every group of characters separated with a space) will be wrapped
+#'   with a lookaround `(?=*KEYWORD)`. This will match keywords regardless
+#'   of the order in which those words appear.
+#' @param echo (Logical) If `TRUE`, print the results to the console.
+#' @param ignore.case (Logical) If `TRUE`, ignore upper/lowercase differences while
+#'   searching.
+#'
+#' @return Invisibly returns a dataframe of the packages that matched the query 
+#'   together with their descriptions.
+#' @export
+#'
+#' @examples
+#' browse_cran("colorbrewer")
+#' 
+#' #> RColorBrewer 
+#' #>     Provides color schemes for maps (and other graphics) designed by Cynthia 
+#' #>     Brewer as described at http://colorbrewer2.org 
+#' #> 
+#' #> Redmonder 
+#' #>     Provide color schemes for maps (and other graphics) based on the color 
+#' #>     palettes of several Microsoft(r) products. Forked from 'RColorBrewer' 
+#' #>     v1.1-2. 
+#' 
+#' @md
+browse_cran <- function(query, fuzzy = FALSE, echo = TRUE, ignore.case = TRUE) {
+    # Downloading the CRAN package list is slow (10 seconds for me), so I only want
+    # to do it once per session.
+    
+    temp_crandb_file <- file.path(tempdir(), "temp_cran_db.rds")
+    
+    if (!file.exists(temp_crandb_file)) {
+        raw <- tools::CRAN_package_db()[c("Package", "Description")]
+        raw["Description"] <- gsub("\\s+", " ", raw[["Description"]])
+        raw["Description"] <- gsub("\\s?<.*>", "", raw[["Description"]])
+        
+        cran_db <- data.frame(Package = raw[["Package"]],
+                              Description = raw[["Description"]],
+                              Haystack = paste(raw[["Package"]], raw[["Description"]]),
+                              stringsAsFactors = FALSE)
+        
+        saveRDS(cran_db, temp_crandb_file)
+    } else {
+        cran_db <- readRDS(temp_crandb_file)
+    }
+    
+    # Matching unordered terms with PERL regex is super slow, so it's opt-in.
+    
+    if (fuzzy == TRUE) {
+        query <- fuzzy_needle(query)
+    }
+    
+    matching_rows <- grep(query, cran_db[["Haystack"]], 
+                          ignore.case = ignore.case, perl = TRUE)
+    
+    # Remember to omit the "haystack" col.
+    matches <- cran_db[matching_rows, c("Package", "Description")]
+    
+    if (echo == TRUE) {
+        for (i in 1:nrow(matches)) {
+            cat(matches[[i, "Package"]], "\n")
+            cat(wrap_long(matches[[i, "Description"]]), "\n\n")
+        }
+    }
+    
+    return(invisible(matches))
 }
