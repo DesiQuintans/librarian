@@ -1,5 +1,5 @@
-# Internal functions for librarian.
 
+# Internal functions for Librarian ---------------------------------------------
 
 #' Non-standard evaluation of dots with base R
 #'
@@ -135,6 +135,8 @@ check_attached <- function(packages = NULL) {
         return(status)
     }
 }
+
+
 
 #' Build a path, creating subfolders if needed
 #'
@@ -309,7 +311,42 @@ wrap_long <- function(..., trim = 200, width = 80, indent = 4, exdent = indent,
 
 
 
-# Runs with devtools::release().
+is_valid_url <- function(string) {
+    # Automated testing fails with devtools::check() (but passes with devtools::test()) if
+    # the repo arg for install.packages() is not set properly. If I run getOption("repos")
+    # in R.exe running in the shell, I get the named vector c("CRAN" = "@CRAN@"), which is
+    # probably what was causing the error. To catch this, I'll test whether cran_repo is 
+    # a URL.
+    
+    # Regex is "@stephenhay" from https://mathiasbynens.be/demo/url-regex because it's the 
+    # shortest regex that matches every CRAN mirror at https://cran.r-project.org/mirrors.html
+    cran_repo_is_url <- grepl("(https?|ftp)://[^\\s/$.?#].[^\\s]*", cran_repo)
+}
+
+
+
+#' Assert that a URL is complete and valid
+#'
+#' @details The regex I use is "@stephenhay" from 
+#' <https://mathiasbynens.be/demo/url-regex> because it's the shortest regex that 
+#' matches every CRAN mirror at <https://cran.r-project.org/mirrors.html>.
+#'
+#' @param string (Character) A URL to check.
+#'
+#' @return A logical value, `TRUE` if the URL is valid, `FALSE` if otherwise.
+#'
+#' @examples
+#' is_valid_url("http://rstudio.com")
+#'
+#' @md
+is_valid_url <- function(string) {
+    any(grepl("(https?|ftp)://[^\\s/$.?#].[^\\s]*", string))
+}
+
+
+
+# Runs with devtools::release() ------------------------------------------------
+
 release_questions <- function() {
     c(
         "Have you run devtools::test()?"
