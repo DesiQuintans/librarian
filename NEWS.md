@@ -1,6 +1,6 @@
 # librarian 1.6.0 (2019-02-19)
 
-- MOD - `biocLite` has been replaced with `BiocManager` for installing Bioconductor packages. `BiocManager` has been added as a dependency.
+- MOD - `biocLite` has been replaced with `BiocManager` for installing BioConductor packages. `BiocManager` has been added as a dependency.
 - FIX - Various spelling errors in preparation for CRAN submission.
 - ADD - Vignette for CRAN
 - ADD - `browse_cran()` for searching CRAN package titles and descriptions by keyword or regular expression.
