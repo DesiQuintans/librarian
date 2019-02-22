@@ -25,8 +25,10 @@ or the current working directory). See Details for more.}
 A message listing the values that were written to the .Rprofile file.
 }
 \description{
-This function writes code to a .Rprofile file that R reads at the start of every new
-session.
+This function tells R to load packages and library folders at the start of every
+session (or on a per-project basis). It's best to keep this auto-load list to a
+minimum so that you don't forget to explicitly install/attach packages in scripts
+that need them.
 }
 \details{
 R's startup order is mentioned in \code{?Startup}, but briefly:
@@ -44,9 +46,7 @@ packages: datasets, utils, grDevices, graphics, stats, and methods.
 }
 \examples{
 \donttest{
-lib_startup(librarian)
-
-lib_startup(librarian, dplyr, lubridate)
+lib_startup(librarian, magrittr, lib = "C:/Dropbox/My R Library")
 }
 
 }

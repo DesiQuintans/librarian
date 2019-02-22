@@ -420,8 +420,10 @@ lib_paths <- function(path, make_path = TRUE, ask = TRUE) {
 
 #' Set packages and library paths to automatically start-up with R
 #'
-#' This function writes code to a .Rprofile file that R reads at the start of every new 
-#' session.
+#' This function tells R to load packages and library folders at the start of every
+#' session (or on a per-project basis). It's best to keep this auto-load list to a 
+#' minimum so that you don't forget to explicitly install/attach packages in scripts 
+#' that need them.
 #'
 #' @param ... (Names) Packages as bare names. For packages that come from GitHub, you can
 #'    keep the username/package format, or omit the username and provide just the package 
@@ -451,9 +453,7 @@ lib_paths <- function(path, make_path = TRUE, ask = TRUE) {
 #'
 #' @examples
 #' \donttest{
-#' lib_startup(librarian)
-#' 
-#' lib_startup(librarian, dplyr, lubridate)
+#' lib_startup(librarian, magrittr, lib = "C:/Dropbox/My R Library")
 #' }
 #' 
 #' @md
