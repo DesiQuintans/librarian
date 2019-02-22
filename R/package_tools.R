@@ -530,8 +530,8 @@ lib_startup <- function(..., lib = lib_paths(), global = TRUE) {
 
 #' Search for CRAN packages by keyword/regex
 #'
-#' Inspired by my mysterious inability to remember what the ColorBrewer package is 
-#' actually called.
+#' Inspired by my mysterious inability to remember what the RColorBrewer package is 
+#' actually called. Lets you find relevant CRAN packages right from your terminal.
 #'
 #' @param query (Character) A string to `grep()` for.
 #' @param fuzzy (Logical) If `TRUE`, enables fuzzy orderless matching. Every word in

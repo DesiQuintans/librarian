@@ -24,8 +24,8 @@ Invisibly returns a dataframe of the packages that matched the query
 together with their descriptions. Prints results to the console.
 }
 \description{
-Inspired by my mysterious inability to remember what the ColorBrewer package is
-actually called.
+Inspired by my mysterious inability to remember what the RColorBrewer package is
+actually called. Lets you find relevant CRAN packages right from your terminal.
 }
 \details{
 When \code{browse_cran()} is run for the first time in a new session, it will
