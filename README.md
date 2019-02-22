@@ -328,7 +328,7 @@ lib_startup()
 
 ### browse_cran
 
-`browse_cran()` lets you discover CRAN packages from your terminal.
+`browse_cran()` lets you discover CRAN packages from your terminal. The first time you run `browse_cran()` in a session, it will take about 6–12 seconds to download and cache CRAN data. This only happens once per session; subsequent calls will use the cached copy.
 
     browse_cran("colorbrewer")
     

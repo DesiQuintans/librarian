@@ -535,13 +535,17 @@ lib_startup <- function(..., lib = lib_paths(), global = TRUE) {
 #' @param ignore.case (Logical) If `TRUE`, ignore upper/lowercase differences while
 #'   searching.
 #'
+#' @details When `browse_cran()` is run for the first time in a new session, it will 
+#'    take about 6-12 seconds to download and cache CRAN data. This only happens once 
+#'    per session; subsequent calls will use the cached copy.
+#'
 #' @return Invisibly returns a dataframe of the packages that matched the query 
-#'   together with their descriptions.
+#'   together with their descriptions. Prints results to the console.
 #' @export
 #'
 #' @examples
 #' \donttest{
-#' browse_cran("colorbrewer")
+#' browse_cran("colorbrewer")  # Search by keyword
 #' 
 #' #> RColorBrewer 
 #' #>     Provides color schemes for maps (and other graphics) designed by Cynthia 
@@ -551,6 +555,24 @@ lib_startup <- function(..., lib = lib_paths(), global = TRUE) {
 #' #>     Provide color schemes for maps (and other graphics) based on the color 
 #' #>     palettes of several Microsoft(r) products. Forked from 'RColorBrewer' 
 #' #>     v1.1-2. 
+#' 
+#' 
+#' browse_cran("zero-inflat.*?(abund|count)")  # Search by regular expression
+#'
+#' #> hurdlr 
+#' #>     When considering count data, it is often the case that many more zero 
+#' #>     counts than would be expected of some given distribution are observed. It 
+#' #>     is well established that data such as this can be reliab[...] 
+#' 
+#' # And five other matches...
+#'
+#'
+#' browse_cran("network twitter api", fuzzy = TRUE)  # Order-agnostic (fuzzy) search
+#'
+#' #> RKlout 
+#' #>     An interface of R to Klout API v2. It fetches Klout Score for a Twitter 
+#' #>     Username/handle in real time. Klout is a website and mobile app that uses 
+#' #>     social media analytics to rank its users according to [...] 
 #' }
 #' 
 #' @md
