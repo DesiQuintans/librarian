@@ -285,6 +285,8 @@ unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, 
 
 #' Detach and then reattach packages to the search path
 #'
+#' Convenience shortcut for force-`unshelf`ing packages and then `shelf`ing them again.
+#'
 #' @param ... (Names) Packages as bare names. For packages that come from GitHub, you can
 #'    keep the username/package format, or omit the username and provide just the package 
 #'    name.

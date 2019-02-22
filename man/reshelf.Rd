@@ -16,7 +16,7 @@ Invisibly returns a named logical vector, where the names are the packages
 requested in \code{...} and \code{TRUE} means that the package was successfully attached.
 }
 \description{
-Detach and then reattach packages to the search path
+Convenience shortcut for force-\code{unshelf}ing packages and then \code{shelf}ing them again.
 }
 \examples{
 \donttest{
