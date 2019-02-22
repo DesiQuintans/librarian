@@ -45,18 +45,17 @@ Using bare names instead of strings frees you from typing quotes all the time. H
 
 You can install _librarian_ from CRAN or from GitHub. The GitHub version is under constant development, but it has more features and it is stable for use (it's the one I personally use, after all).
 
-_Features that are currently **MISSING** from the CRAN release:_ BioConductor support via `shelf()` (v 1.4.0). Automatic library paths and package attaching at the start of an R session via `lib_startup()` (v 1.5.0). Package discovery via `browse_cran()` (v 1.6.0).
+_Features that are currently **MISSING** from the CRAN release:_ None, we're up to date! The last CRAN release was v1.6.0 on 2019-02-22.
 
 ``` r
+# From CRAN:
+
+install.packages("librarian")
+
 # From GitHub:
 
 install.packages("remotes")
 remotes::install_github("DesiQuintans/librarian")
-
-
-# From CRAN:
-
-install.packages("librarian")
 ```
 
 Once it's installed, you can get librarian to automatically load at the start of every R session:
