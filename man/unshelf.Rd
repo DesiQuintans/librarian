@@ -30,7 +30,10 @@ Invisibly returns a named logical vector, where the names are the packages
 and \code{TRUE} means that the package was successfully detached.
 }
 \description{
-Detach (unload) packages from the search path
+Packages can be detached by themselves, with their dependencies safely (i.e. as
+long as those dependencies are not being used by other packages), or with their
+dependencies unsafely (regardless of whether those dependencies are still needed).
+All non-default packages can be detached at once too, including Librarian itself.
 }
 \examples{
 \donttest{

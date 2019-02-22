@@ -173,6 +173,11 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
 
 
 #' Detach (unload) packages from the search path
+#' 
+#' Packages can be detached by themselves, with their dependencies safely (i.e. as  
+#' long as those dependencies are not being used by other packages), or with their
+#' dependencies unsafely (regardless of whether those dependencies are still needed).
+#' All non-default packages can be detached at once too, including Librarian itself.
 #'
 #' @param ... (Names) Packages as bare names. For packages that come from GitHub, you can
 #'    keep the username/package format, or omit the username and provide just the package 
