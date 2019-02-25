@@ -13,18 +13,18 @@ test_that("'datasets' is attached by default, so unattach it.", {
     expect_equal(sum(check_attached(nse_dots(datasets))), 0)
 })
 
-test_that("Try to shelf() datasets", {
+test_that("Try to shelf() 'datasets'", {
     skip_on_cran()
     expect_equal(sum(shelf(datasets, cran_repo = "https://cran.r-project.org")), 1)
 })
 
-test_that("Try to unshelf() datasets", {
+test_that("Try to unshelf() 'datasets'", {
     skip_on_cran()
     # Has to be safe = FALSE or else R CMD CHECK is unhappy.
     expect_equal(sum(unshelf(datasets, safe = FALSE)), 1)
 })
 
-test_that("Try to reshelf() datasets", {
+test_that("Try to reshelf() 'datasets'", {
     skip_on_cran()
     expect_equal(sum(reshelf(datasets)), 1)
 })
