@@ -44,17 +44,21 @@ test_that("A user can pass a mixture of bare names and strings to nse_dots()", {
 
 test_that("nse_dots() removes duplicated names", {
     skip_on_cran()
-    expect_equal(length(nse_dots(dplyr, purrr, dplyr)), 2)
-    expect_equal(length(nse_dots(DesiQuintans/desiderata, DesiQuintans/desiderata)), 1)
-    expect_equal(length(nse_dots(dplyr, dplyr, DesiQuintans/desiderata, DesiQuintans/desiderata)), 2)
+    expect_identical(nse_dots(dplyr, purrr, dplyr), c("dplyr", "purrr"))
+    expect_identical(nse_dots(DesiQuintans/desiderata, DesiQuintans/desiderata), "desiderata")
+    expect_identical(nse_dots(DesiQuintans/desiderata, DesiQuintans/desiderata), "desiderata")
+    expect_identical(nse_dots(DesiQuintans/desiderata, DesiQuintans/desiderata, keep_user = TRUE), "DesiQuintans/desiderata")
+    expect_identical(nse_dots(dplyr, dplyr, DesiQuintans/desiderata, DesiQuintans/desiderata), c("dplyr", "desiderata"))
 })
 
 test_that("nse_dots() removes (or keeps) the username correctly", {
     skip_on_cran()
-    expect_equal(length(nse_dots(dplyr, keep_user = TRUE)), 1)
-    expect_equal(length(nse_dots(dplyr, keep_user = FALSE)), 1)
-    expect_equal(length(nse_dots(DesiQuintans/desiderata, keep_user = TRUE)), 1)
-    expect_equal(length(nse_dots(DesiQuintans/desiderata, keep_user = FALSE)), 1)
-    expect_equal(length(nse_dots(dplyr, DesiQuintans/desiderata, desiderata, keep_user = TRUE)), 3)
-    expect_equal(length(nse_dots(dplyr, DesiQuintans/desiderata, desiderata, keep_user = FALSE)), 2)
+    expect_identical(nse_dots(dplyr, keep_user = TRUE), "dplyr")
+    expect_identical(nse_dots(dplyr, keep_user = FALSE), "dplyr")
+    expect_identical(nse_dots(DesiQuintans/desiderata, keep_user = TRUE), "DesiQuintans/desiderata")
+    expect_identical(nse_dots(DesiQuintans/desiderata, keep_user = FALSE), "desiderata")
+    expect_identical(nse_dots(dplyr, DesiQuintans/desiderata, desiderata, keep_user = TRUE), 
+                     c("dplyr", "DesiQuintans/desiderata", "desiderata"))
+    expect_identical(nse_dots(dplyr, DesiQuintans/desiderata, tidyr, keep_user = FALSE), 
+                     c("dplyr", "desiderata", "tidyr"))
 })
