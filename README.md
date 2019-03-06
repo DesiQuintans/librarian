@@ -1,5 +1,8 @@
 # `librarian` - One-step packages from CRAN, GitHub, and Bioconductor
 
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/librarian)](https://cran.r-project.org/package=librarian)
+[![Download Stats](http://cranlogs.r-pkg.org/badges/librarian)](https://cran.r-project.org/package=librarian)
+
 ``` r
 librarian::shelf(dplyr, DesiQuintans/desiderata, phyloseq)
                    ↑        ↑                      ↑
