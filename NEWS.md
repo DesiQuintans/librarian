@@ -1,3 +1,10 @@
+# librarian 1.6.1 (2019-03-09)
+
+- FIX - `unshelf()` with `everything = TRUE` arg now detaches **all** non-default packages if `safe = FALSE` is also set. In the past, it would leave behind the packages that you had added to your .Rprofile using `lib_startup()`. This is still the default behaviour.
+- ADD - Various behind-the-scenes helper functions in preparation for a code refactor.
+
+
+
 # librarian 1.6.0 (2019-02-19)
 
 - MOD - `biocLite` has been replaced with `BiocManager` for installing BioConductor packages. `BiocManager` has been added as a dependency.

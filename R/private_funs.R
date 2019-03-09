@@ -333,6 +333,60 @@ is_valid_url <- function(string) {
 
 
 
+#' Detach a vector of packages
+#'
+#' @param pkgs (Character) Names of packages to detach, excluding the "package:" prefix.
+#'
+#' @return A logical vector with the packages as names. TRUE means that a package was 
+#'    detached, FALSE means that the package is still attached.
+detach_pkgs <- function(pkgs) {
+    pkgs_prefixed <- sub("^", "package:", pkgs)
+    
+    if (length(pkgs_prefixed) > 0) {
+        suppressWarnings(
+            lapply(pkgs_prefixed, detach, unload = TRUE, character.only = TRUE)
+        )
+    }
+    
+    return(invisible(!check_attached(pkgs)))  # Flip so that TRUE indicates successful detaching.
+}
+
+
+
+"%notin%" <- function(x, y) {
+    !(match(x, y, nomatch = 0) > 0)
+}
+
+
+
+#' List the dependencies of selected packages
+#'
+#' @param of_pkgs (Character) Packages whose dependencies to list.
+#' @param which (Character) The types of dependencies to find.
+#'
+#' @return A character vector of package names.
+list_dependencies <- function(of_pkgs, which = c("Depends", "Imports")) {
+    deps_chosen <- tools::package_dependencies(of_pkgs, which = which)
+    unique(unname(unlist(deps_chosen)))
+}
+
+
+
+#' Produce a nicely-wrapped paragraph for console printing
+#'
+#' @param ... Vectors to be coerced to Character.
+#'
+#' @return A message.
+announce <- function(fun, ...) {
+    text <- strwrap(paste(c(...), collapse = " "), 
+                    width = 75, indent = 2, exdent = 2, 
+                    prefix = "\n", simplify = TRUE)
+    
+    do.call(fun, list(text))
+}
+
+
+
 # Runs with devtools::release() ------------------------------------------------
 
 release_questions <- function() {

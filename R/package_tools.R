@@ -222,63 +222,61 @@ unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, 
     if (is_dots_empty(...) == TRUE && everything == FALSE) {
         # Errors should not be 'quiet'-able.
         stop("No packages were chosen for detaching. Either provide the names of ", 
-             "packages, or set 'everything = TRUE' to detach all non-Base packages.")
+             "packages, or set 'everything = TRUE' to detach all non-default packages.")
     }
     
-    attached <- check_attached()
+    session_info  <- utils::sessionInfo()
+    base_pkgs     <- session_info$basePkgs
+    user_pkgs     <- names(session_info$otherPkgs)
+    attached      <- c(base_pkgs, user_pkgs)
+    rprofile_pkgs <- c(getOption("defaultPackages"), "base")
+    
+    # getOption("defaultPackages") does not always list only the base packages since
+    # lib_startup() changes this variable to make packages load at the start of your
+    # session. That's why I use sessionInfo()$basePkgs to list the base packages.
     
     if (everything == TRUE) {
-        # Detach everything that isn't a base package.
-        base_pkgs <- c(getOption("defaultPackages"), "base")  # Base is absent from the list
-        to_detach <- attached[which(!attached %in% base_pkgs)]
-        pkgs_chosen <- to_detach  # HACK: Pretend that the user named all of these non-Base packages.
-    } else {
-        # Detach only the packages that are requested.
-        pkgs_chosen <- nse_dots(..., keep_user = FALSE)
-        
-        # If chosen, also detach the dependencies of the listed packages.
-        if (also_depends == TRUE) {
-            # Get the dependency list of the packages named in ...
-            deps_chosen <- tools::package_dependencies(pkgs_chosen, which = c("Depends", "Imports"))
-            deps_chosen <- unique(unname(unlist(deps_chosen)))
-            
-            # Don't detach the default packages.
-            deps_chosen <- deps_chosen[which(!deps_chosen %in% c(getOption("defaultPackages"), "base"))]
-            
-            pkgs_chosen <- unique(append(pkgs_chosen, deps_chosen))
-        }
-        
-        to_detach <- pkgs_chosen[which(pkgs_chosen %in% attached)]
-
-        # If safe, don't detach packages that other still-attached packages need.
         if (safe == TRUE) {
-            # Get the dependency list of the attached packages NOT named in ...
-            pkgs_remaining <- attached[which(!attached %in% pkgs_chosen)]
-            deps_remaining <- tools::package_dependencies(pkgs_remaining, which = c("Depends", "Imports"))
-            deps_remaining <- unique(unname(unlist(deps_remaining)))
-
-            to_detach <- to_detach[which(!to_detach %in% deps_remaining)]
+            # Will keep the packages that the user has in their .Rprofile.
+            detach_pkgs(attached[attached %notin% rprofile_pkgs])
+        } else {
+            # Will keep default packages only.
+            detach_pkgs(attached[attached %notin% base_pkgs])
         }
+    } else {
+        # Will detach packages that were requested
+        pkgs_chosen <- nse_dots(..., keep_user = FALSE)
+        deps_chosen <- character(0)
+        
+        if (also_depends == TRUE) {
+            # Populate the dependency list for the chosen packages.
+            deps_chosen <- list_dependencies(pkgs_chosen)
+        }
+        
+        to_detach <- unique(c(pkgs_chosen, deps_chosen))
+        
+        if (safe == TRUE) {
+            # Get the dependency list of the attached packages NOT named in dots
+            deps_remaining <- list_dependencies(attached[attached %notin% pkgs_chosen])
+            
+            to_detach <- to_detach[to_detach %notin% deps_remaining]
+            
+            if (quiet == FALSE & length(deps_remaining) > 0) {
+                pkgs_kept <- pkgs_chosen[pkgs_chosen %in% deps_remaining]
+                
+                announce(message,
+                         "Some packages were not detached because other packages still need them:\n\n",
+                         paste(pkgs_kept, collapse = "  "),
+                         "\n\nTo force them to detach, use the 'safe = FALSE' argument.")
+            }
+        }
+        
+        # Finally, detach() throws an error if you ask it to detach a package that
+        # isn't currently attached.
+        to_detach <- to_detach[to_detach %in% attached]
+        
+        detach_pkgs(to_detach)
     }
-    
-    # Need to add a "package:" descriptor to the start of names for detach().
-    to_detach_prefixed <- sub("^", "package:", to_detach)
-    
-    if (length(to_detach_prefixed) > 0) {
-        suppressWarnings(
-            lapply(to_detach_prefixed, detach, unload = TRUE, character.only = TRUE)
-        )
-    }
-
-    result <- !check_attached(sort(unique(c(pkgs_chosen, to_detach))))  # Invert so that TRUE means 'detached'.
-    
-    if ((quiet == FALSE) & (sum(result) < length(result))) { # If result has FALSEs.
-        message("Some packages were not detached because other packages still need them:\n  ",
-                paste(names(result[result == FALSE]), collapse = "  "),
-                "\n  To force them to detach, use the 'safe = FALSE' argument.")
-    }
-    
-    return(invisible(result))  
 }
 
 
