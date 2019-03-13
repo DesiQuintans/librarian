@@ -1,4 +1,6 @@
-# Package management
+
+# Installing, attaching, detaching packages -------------------------------
+
 
 
 #' Attach packages to the search path, installing them from CRAN, GitHub, or Bioconductor if needed
@@ -56,38 +58,30 @@
 #' }
 #' 
 #' @md
-shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask = TRUE, 
+shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask = TRUE,
                   cran_repo = getOption("repos"), bioc_repo = character()) {
-    if (is_dots_empty(...) == TRUE) {
-        # Errors should not be 'quiet'-able.
-        stop("No packages were chosen for attaching.")
+
+    # Sanitise user input
+    if (dots_is_empty(...)) {
+        stop(tell_user("no packages were chosen"))
     }
     
-    # install_github() lacks a `lib` argument and always installs to the first element 
-    # in .libPaths(). The install location must therefore be controlled by adding new 
-    # folders to the front of .libPaths(). lib_paths() is a wrapper that also includes
-    # automatic folder creation as a convenience to the user.
-    lib_paths(lib, make_path = TRUE, ask = ask)
+    packages <- nse_dots(..., keep_user = TRUE)
     
-    # Automated testing fails with devtools::check() (but passes with devtools::test()) if
-    # the repo arg for install.packages() is not set properly. If I run getOption("repos")
-    # in R.exe running in the shell, I get the named vector c("CRAN" = "@CRAN@"), which is
-    # probably what was causing the error. To catch this, I'll test whether cran_repo is 
-    # a URL.
-
+    # Make sure that the library path exists, and keep the first entry (it is
+    # the one that the package installation functions use.
+    lib <- lib_paths(lib, make_path = TRUE, ask = ask)[[1]]
+    
+    # CRAN's repo needs to be set to a valid URL or else it will create errors
+    # in devtools::check(). 
     if (is_valid_url(cran_repo) == FALSE) {
         if (quiet == FALSE) {
             if (cran_repo == "@CRAN@") {
                 # Special case for R's default CRAN placeholder value.
                 # See issue #10: https://github.com/DesiQuintans/librarian/issues/10
-                message("The 'cran_repo' argument in shelf() was not set, so it will \n",
-                        "use cran_repo = 'https://cran.r-project.org' by default.\n\n",
-                        "To avoid this message, set the 'cran_repo' argument to a\n",
-                        "CRAN mirror URL (see https://cran.r-project.org/mirrors.html)\n", 
-                        "or set 'quiet = TRUE'.")
+                message(tell_user("fixed cran repo placeholder"))
             } else {
-                warning("This is not a valid URL: cran_repo = '", as.character(cran_repo), "'\n", 
-                        "Defaulting to cran_repo = 'https://cran.r-project.org'.")
+                warning(tell_user("invalid CRAN repo URL", cran_repo))
             }
         }
         
@@ -95,18 +89,16 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
         cran_repo <- "https://cran.r-project.org"
     }
     
-    # 1. Get dots (which contains the requested package names).
-    packages <- nse_dots(..., keep_user = TRUE)
-
-    # 2. Separate the GitHub packages from the CRAN ones. They'll contain a forward-slash.
+    
+    # 1. Separate the GitHub packages from the CRAN ones. They'll contain a forward-slash.
     github_pkgs <- grep("^.*?/.*?$", packages, value = TRUE)
     github_bare_pkgs <- sub(".*?/", "", github_pkgs)
     
     cran_pkgs <- packages[!(packages %in% github_pkgs)]  # This may also contain Bioconductor pkgs.
     all_pkgs <- append(cran_pkgs, github_bare_pkgs)
     
-    # 3a. If a package is missing from the library, install it.
-    # 3b. To force packages to update, just pretend that they're all missing.
+    # 2a. If a package is missing from the library, install it.
+    # 2b. To force packages to update, just pretend that they're all missing.
     if (update_all == TRUE) {
         cran_missing   <- cran_pkgs
         github_missing <- github_pkgs
@@ -115,21 +107,21 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
         github_missing <- github_pkgs[which(!check_installed(github_bare_pkgs))]
     }
     
+    
     if (length(cran_missing) > 0) {
         suppressWarnings(  # Warnings from trying to install non-CRAN packages (i.e. Bioconductor).
-            suppress_lib_message(  # "Installing package into ... (as ‘lib’ is unspecified)"
-                utils::install.packages(cran_missing, quiet = quiet, repos = cran_repo)
-            )
+                utils::install.packages(cran_missing, lib = lib, 
+                                        quiet = quiet, repos = cran_repo)
         )
     }
     
     if (length(github_missing) > 0) {
-        suppress_lib_message(
-            remotes::install_github(github_missing, quiet = quiet)
+        suppressWarnings(
+            remotes::install_github(github_missing, quiet = quiet, lib = lib)
         )
     }
     
-    # 4. CRAN packages that failed to install may be Bioconductor packages.
+    # 3. CRAN packages that failed to install may be Bioconductor packages.
     cran_still_missing <- cran_missing[which(!check_installed(cran_missing))]
     
     if (length(cran_still_missing) > 0 & check_installed("Biobase") == TRUE) {
@@ -139,35 +131,30 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
             # update all other installed packages too. I tried running it with
             # `ask = FALSE` and it updated everything in my R installation :/
             BiocManager::install(cran_still_missing, site_repository = bioc_repo,
-                                 update = FALSE, ask = FALSE, quiet = quiet)
+                                 update = FALSE, ask = FALSE, quiet = quiet, lib = lib)
         )
     }
     
-    # 5a. Find the packages that aren't attached yet.
-    # 5b. Omit any packages that failed installation.
+    # 4a. Find the packages that aren't attached yet.
+    # 4b. Omit any packages that failed installation.
     not_attached <- all_pkgs[which(check_installed(all_pkgs) == TRUE & check_attached(all_pkgs) == FALSE)]
     failed_install <- all_pkgs[which(!check_installed(all_pkgs))]
     
-    # 6. Attach those packages.
+    # 5. Attach those packages.
     if (length(not_attached) > 0) {
-        # Bioconductor packages have SO MANY annoying package startup messages that 
-        # are actually just sent as plain messages. Should I suppress them?
-        lapply(not_attached, library, character.only = TRUE, quietly = quiet)
+        suppressPackageStartupMessages(
+            lapply(not_attached, library, character.only = TRUE, quietly = quiet)
+        )
     }
     
     if (length(failed_install) > 0) {
-        warning("\n\n  These packages failed to install and were not attached:\n\n",
-                "    ", paste(failed_install, collapse = ", "), "\n\n",
-                "  Are they Bioconductor packages? If so, please install Bioconductor\n",
-                "  before running librarian::shelf().\n\n",
-                "  Are they from GitHub? Please supply both the GitHub username and\n",
-                "  package name, e.g. DesiQuintans/librarian\n\n",
-                "  Otherwise, check the spelling and capitalisation of the names.\n",
-                "  It's also possible that the packages are someone's private packages\n",
-                "  that are not being shared online.")
+        warning(tell_user("some packages failed to install", failed_install))
     }
     
-    return(invisible(check_attached(nse_dots(..., keep_user = FALSE))))
+    # GitHub usernames need to be removed from the final list.
+    bare_names <- sub("^.*?/", "", packages)
+    
+    return(invisible(check_attached(bare_names)))
 }
 
 
@@ -219,11 +206,14 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
 #' 
 #' @md
 unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, quiet = TRUE) {
-    if (is_dots_empty(...) == TRUE && everything == FALSE) {
+    if (dots_is_empty(...) == TRUE && everything == FALSE) {
         # Errors should not be 'quiet'-able.
-        stop("No packages were chosen for detaching. Either provide the names of ", 
-             "packages, or set 'everything = TRUE' to detach all non-default packages.")
+        stop(tell_user("nothing to unshelf"))
     }
+    
+    # getOption("defaultPackages") does not always list only the base packages since
+    # lib_startup() changes this variable to make packages load at the start of your
+    # session. That's why I use sessionInfo()$basePkgs to list the base packages.
     
     session_info  <- utils::sessionInfo()
     base_pkgs     <- session_info$basePkgs
@@ -231,9 +221,18 @@ unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, 
     attached      <- c(base_pkgs, user_pkgs)
     rprofile_pkgs <- c(getOption("defaultPackages"), "base")
     
-    # getOption("defaultPackages") does not always list only the base packages since
-    # lib_startup() changes this variable to make packages load at the start of your
-    # session. That's why I use sessionInfo()$basePkgs to list the base packages.
+    # Processes a vector of package names and then tries to detach them.
+    detach_pkgs <- function(to_detach, full_list) {
+        pkgs_prefixed <- sub("^", "package:", to_detach)
+        
+        if (length(pkgs_prefixed) > 0) {
+            suppressWarnings(
+                lapply(pkgs_prefixed, detach, unload = TRUE, character.only = TRUE)
+            )
+        }
+        
+        return(invisible(!check_attached(full_list)))  # Flip so that TRUE indicates successful detaching.
+    }
     
     if (everything == TRUE) {
         if (safe == TRUE) {
@@ -257,25 +256,20 @@ unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, 
         
         if (safe == TRUE) {
             # Get the dependency list of the attached packages NOT named in dots
-            deps_remaining <- list_dependencies(attached[attached %notin% pkgs_chosen])
+            deps_not_chosen <- list_dependencies(attached[attached %notin% pkgs_chosen])
             
-            to_detach <- to_detach[to_detach %notin% deps_remaining]
+            pkgs_kept <- to_detach[to_detach %in% deps_not_chosen]
+            to_detach <- to_detach[to_detach %notin% deps_not_chosen]
             
-            if (quiet == FALSE & length(deps_remaining) > 0) {
-                pkgs_kept <- pkgs_chosen[pkgs_chosen %in% deps_remaining]
-                
-                announce(message,
-                         "Some packages were not detached because other packages still need them:\n\n",
-                         paste(pkgs_kept, collapse = "  "),
-                         "\n\nTo force them to detach, use the 'safe = FALSE' argument.")
+            if (quiet == FALSE & length(pkgs_kept) > 0) {
+                message(tell_user("some packages still being used", pkgs_kept))
             }
         }
         
-        # Finally, detach() throws an error if you ask it to detach a package that
-        # isn't currently attached.
+        full_list <- to_detach
         to_detach <- to_detach[to_detach %in% attached]
         
-        detach_pkgs(to_detach)
+        detach_pkgs(to_detach, full_list)
     }
 }
 
@@ -315,6 +309,7 @@ reshelf <- function(...) {
 
 
 
+# Library paths and .Rprofile ---------------------------------------------
 
 #' Changing and viewing the package search paths
 #' 
@@ -340,76 +335,66 @@ reshelf <- function(...) {
 #' \donttest{
 #' lib_paths()
 #' 
-#' #> [1] "D:/R/R-3.5.0/library"
+#' #> [1] "D:/R/R-3.5.2/library"
 #' 
 #' lib_paths(file.path(tempdir(), "newlibraryfolder"), ask = FALSE)
 #' 
 #' #> [1] "C:/Users/.../Temp/Rtmp0Qbvgo/newlibraryfolder"
-#' #> [2] "D:/R/R-3.5.0/library"
+#' #> [2] "D:/R/R-3.5.2/library"
 #' }
 #' 
 #' @md
 lib_paths <- function(path, make_path = TRUE, ask = TRUE) {
-    if (missing(path)) {
-        return(.libPaths())
+    existing_paths <- .libPaths()
+    
+    if (missing(path) || is.null(path) || is.na(path) || nchar(path) == 0) {
+        return(existing_paths)
     }
     
-    if (is.null(path) || is.na(path) || nchar(path) == 0) {
-        # Standard behaviour for install.packages() and install_github() is to use the 
-        # first element in .libPaths().
-        path <- .libPaths()[1]
-    }
-    
-    # Consistent with the behaviour above, keep only the first element of 'folder' in case
-    # it has more than one. 
-    
-    # Tilde expansion is done just like .libPaths(), except I use normalizePath() 
+    # Tilde expansion is done just like .libPaths(), except I use normalizePath()
     # instead of path.expand() so that 'folder' is an absolute path.
     
     # Unlike .libPaths(), wildcard expansion (globbing) is NOT done because it fails when
     # the user offers a library folder that doesn't exist yet (presumably so it can be
     # created by this very function).
-    path <- normalizePath(path[1], winslash = "/", mustWork = FALSE)
+    path      <- normalizePath(path, winslash = "/", mustWork = FALSE)
+    exists    <- path[which(dir.exists(path))]
+    non_exist <- path[path %notin% exists]
     
-    if (dir.exists(path) == FALSE) {
+    
+    # Some folders need to be created.
+    if (length(non_exist) > 0) {
         if (make_path == FALSE) {
-            stop("The path '", 
-                 normalizePath(path, winslash = "\\", mustWork = FALSE),
-                 "' does not exist. To create it, set the argument make_path = TRUE.")
+            stop(tell_user("not allowed to make path", non_exist))
         }
         
         if (ask == TRUE && interactive() == FALSE) {
-            # The user can't be prompted, so do nothing rather than create folders unattended.
-            stop("The library path will not be created because the user can't be prompted ",
-                 "while R is running non-interactively. To create the folder without ", 
-                 "prompting, set the argument ask = FALSE.")
+            stop(tell_user("cannot get user feedback in a non-interactive session", non_exist))
         }
         
         if (ask == TRUE) {
-            ans <- utils::askYesNo(paste0("The requested library folder does not exist:\n\n", 
-                                   normalizePath(path, winslash = "\\", mustWork = FALSE),
-                                   "\n\nCreate it?"), 
-                            default = FALSE)
+            ans <- utils::askYesNo(tell_user("ask to create path", non_exist), default = FALSE)
             
             if (ans == FALSE || is.na(ans)) {
-                stop("The path '", 
-                     normalizePath(path, winslash = "\\", mustWork = FALSE), 
-                     "' does not exist and was not created.")
+                stop(tell_user("lib paths were not created", non_exist))
             }
         }
         
-        # make_folder = TRUE --- user said yes --- ask = FALSE
-        # Build the whole dir structure leading to 'folder' and return an absolute path to it.
-        path <- make_dirs(path)  
+        lapply(non_exist, make_dirs)
     }
     
-    if (file.access(path, 2) < 0) {  # -1 indicates dir not writeable
-        stop("The path '", path, "' is not writeable.")
+    # Check that all folders are writeable
+    permissions <- unlist(lapply(path, file.access, mode = 2))
+    unwriteable <- permissions[which(permissions < 0)] # -1 means dir not writeable
+    
+    if (length(unwriteable) > 0) {  
+        stop(tell_user("paths not writeable", unwriteable))
     }
     
-    # There is no need to check whether 'folder' already appears in .libPaths(); it will
+    # All folders should now exist, and I can add them to the lib path. There is
+    # no need to check whether 'folder' already appears in .libPaths(); it will
     # not be duplicated when it's prepended.
-    .libPaths(c(path, .libPaths()))
+    .libPaths(c(path, existing_paths))
     
     return(.libPaths())
 }
@@ -458,24 +443,21 @@ lib_paths <- function(path, make_path = TRUE, ask = TRUE) {
 lib_startup <- function(..., lib = lib_paths(), global = TRUE) {
     # 1. Check that the library path folders exist.
     paths <- lib_paths(lib, make_path = TRUE, ask = TRUE)
-        
+    
     # 2. Check if dots is empty or not.
-    if (is_dots_empty(...) == TRUE) {
+    if (dots_is_empty(...) == TRUE) {
         packages <- character(0)
     } else {
         packages <- nse_dots(..., keep_user = FALSE)
     }
-
+    
     # 3. If dots is not empty, check that the packages are all installed.
     if (length(packages) > 0) {
         status <- check_installed(packages)
         
         if (any(!status)) { # !status so that the failed packages are TRUE.
-            # There was a package that was not installed in the search path.
-            stop("Some requested packages are not installed in the current library path:\n\n  ",
-                 paste(names(status[status == FALSE]), collapse = "  "), "\n\n",
-                 "  Use shelf() to install them, or if they are already installed, use\n", 
-                 "  the 'lib' argument to point to the folder they are installed in.")
+            stop(tell_user("can't add uninstalled pkgs to .RProfile", 
+                           names(status[status == FALSE])))
         }
     }
     
@@ -502,29 +484,30 @@ lib_startup <- function(..., lib = lib_paths(), global = TRUE) {
                          pkgs_output, 
                          '))', 
                          libr_marker)
-
+    
     # 6. Check if the .Rprofile file already exists, and remove Librarian code from it.
     file <- if (global == TRUE) "~/.Rprofile" else file.path(getwd(), ".Rprofile")
-
+    
     if (file.exists(file)) {
         lines <- readLines(file)
         lines <- lines[grepl(libr_marker, lines, fixed = TRUE) == FALSE]
     } else {
         lines <- character(0)
     }
-
+    
     # 7. Print the lines to the file
     cat(lines,      file = file, append = FALSE)  # Replace contents of file first.
     cat(path_lines, file = file, append = TRUE)
     cat(pkgs_lines, file = file, append = TRUE)
-    cat("\r\n",     file = file, append = TRUE)   # Terminate the file properly.
-
-    message("Added library paths and startup packages to:\n  ", path.expand(file), "\n\n",
-            "Library paths:\n  ", path_output, "\n\n",
-            "Startup packages:\n  ", pkgs_output)
+    cat("\n",       file = file, append = TRUE)   # Terminate the file properly.
+    
+    message(tell_user(".RProfile was edited", 
+                      path.expand(file), paths, c(def_pkgs, packages)))
 }
 
 
+
+# Package discovery and search --------------------------------------------
 
 #' Search for CRAN packages by keyword/regex
 #'
@@ -558,16 +541,14 @@ lib_startup <- function(..., lib = lib_paths(), global = TRUE) {
 #' #> 
 #' #> Redmonder 
 #' #>     Provide color schemes for maps (and other graphics) based on the color 
-#' #>     palettes of several Microsoft(r) products. Forked from 'RColorBrewer' 
-#' #>     v1.1-2. 
+#' #>     palettes of several Microsoft(r) products.
 #' 
 #' 
 #' browse_cran("zero-inflat.*?(abund|count)")  # Search by regular expression
 #'
 #' #> hurdlr 
 #' #>     When considering count data, it is often the case that many more zero 
-#' #>     counts than would be expected of some given distribution are observed. It 
-#' #>     is well established that data such as this can be reliab[...] 
+#' #>     counts than would be expected of some given distribution are observed.
 #' 
 #' # And five other matches...
 #'
@@ -575,9 +556,7 @@ lib_startup <- function(..., lib = lib_paths(), global = TRUE) {
 #' browse_cran("network twitter api", fuzzy = TRUE)  # Order-agnostic (fuzzy) search
 #'
 #' #> RKlout 
-#' #>     An interface of R to Klout API v2. It fetches Klout Score for a Twitter 
-#' #>     Username/handle in real time. Klout is a website and mobile app that uses 
-#' #>     social media analytics to rank its users according to [...] 
+#' #>     An interface of R to Klout API v2.
 #' }
 #' 
 #' @md
@@ -618,13 +597,84 @@ browse_cran <- function(query, fuzzy = FALSE, echo = TRUE, ignore.case = TRUE) {
     
     # Remember to omit the "haystack" col.
     matches <- cran_db[matching_rows, c("Package", "Description")]
+    matches <- unique(matches)  # Sometimes rows are duplicated for some reason.
     
     if (echo == TRUE) {
         for (i in 1:nrow(matches)) {
             cat(matches[[i, "Package"]], "\n")
-            cat(wrap_long(matches[[i, "Description"]]), "\n\n")
+            cat(wrap_text(sentence(matches[[i, "Description"]])), "\n\n")
         }
     }
     
     return(invisible(matches))
+}
+
+
+
+# Check package status ----------------------------------------------------
+
+#' Check if packages are installed
+#'
+#' @param ... (Dots) Package names as bare names, strings, or a character vector. 
+#'    If left empty, lists all installed packages.
+#'
+#' @return If `dots` is empty, a character vector of all installed packages. 
+#'    Otherwise, return a named logical vector where `TRUE` means the package
+#'    is installed.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' check_installed()
+#' 
+#' #>   [1] "addinslist"  "antiword" " ape"  "assertthat"  ...
+#' 
+#' check_installed(c("utils", "stats"))
+#' 
+#' #> utils stats 
+#' #> TRUE  TRUE 
+#' 
+#' check_installed("datasets", "base", fakepkg)
+#' 
+#' #> datasets     base  fakepkg 
+#' #>     TRUE     TRUE    FALSE 
+#' }
+#' 
+#' @md
+check_installed <- function(...) {
+    check_pkg_status(..., status = "installed")
+}
+
+
+
+#' Check if packages are attached
+#'
+#' @param ... (Dots) Package names as bare names, strings, or a character vector. 
+#'    If left empty, lists all attached packages.
+#'
+#' @return If `dots` is empty, a character vector of all attached packages. 
+#'    Otherwise, return a named logical vector where `TRUE` means the package
+#'    is attached
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' check_attached()
+#' 
+#' #>   [1] "librarian" "testthat"  "magrittr"  "stats" ...
+#' 
+#' check_attached(c("utils", "stats"))
+#' 
+#' #> utils stats 
+#' #> TRUE  TRUE 
+#' 
+#' check_attached("datasets", "base", fakepkg)
+#' 
+#' #> datasets     base  fakepkg 
+#' #>     TRUE     TRUE    FALSE 
+#' }
+#' 
+#' @md
+check_attached <- function(...) {
+    check_pkg_status(..., status = "attached")
 }
