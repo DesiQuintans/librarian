@@ -1,36 +1,52 @@
 context("Installing packages from Bioconductor")
 
-library(librarian)
+# Explicitly attach praise because it's needed at the end of testing so that I
+# can feel good :3
+shelf(praise)
 
-suppressMessages(library(BiocManager))
-
+# Changing lib dirs with .libPaths() keeps only the default R library plus
+# tempdir(). I need to change library locations because the Bioconductor
+# packages may already be installed on my personal paths.
 .libPaths(tempdir())
 
-# I change libpaths immediately after loading those packages because one of the tests
-# below requires that Biobase is not installed to begin with (and it may be installed
-# in my personal library). Using .libPaths() keeps only the default R library plus 
-# any newly installed libraries.
 
-
-
-test_that("Check zlibbioc (Bioconductor) install before Bioconductor is installed.", {
+test_that("Bioconductor packages should not be installed if Biobase is not installed.", {
     skip_on_cran()
-    expect_warning(shelf(zlibbioc, lib = tempdir(), quiet = TRUE, update_all = TRUE), "Are they Bioconductor")
+    
+    expect_warning(
+        shelf(zlibbioc, lib = tempdir(), quiet = TRUE, update_all = TRUE), 
+        "Are they Bioconductor")
 })
 
-# suppressWarnings() because for some reason, this raises two errors:
-# cannot open URL 'https://bioconductor.org/packages/3.8/workflows/bin/windows/contrib/3.5/PACKAGES.rds': HTTP status was '404 Not Found'
-# It only happens when devtools::test() runs it, it doesn't happen when I run the 
-# block in my terminal.
-suppressMessages(
-    suppressWarnings(BiocManager::install("Biobase", ask = FALSE, update = FALSE, quiet = TRUE)))
 
-test_that("Check zlibbioc (Bioconductor) install after Bioconductor is installed.", {
+test_that("BiocManager and Biobase can be installed.", {
     skip_on_cran()
-    expect_equal(sum(shelf(zlibbioc, lib = tempdir(), quiet = TRUE, update_all = TRUE)), 1)
+    
+    expect_identical(
+        shhh(shelf(BiocManager, quiet = TRUE)),
+        c(BiocManager = TRUE)
+    )
+    
+    expect_error(
+        shhh(BiocManager::install("Biobase", ask = FALSE, update = FALSE, quiet = TRUE)),
+        regexp = NA
+    )
+})
+
+
+test_that("Bioconductor packages can be installed when Biobase is installed.", {
+    skip_on_cran()
+    
+    expect_identical(
+        shhh(shelf(zlibbioc, lib = tempdir(), quiet = TRUE, update_all = TRUE)),
+        c(zlibbioc = TRUE)
+    )
 })
 
 test_that("Try to unshelf() zlibbioc", {
     skip_on_cran()
-    expect_equal(sum(unshelf(zlibbioc, safe = FALSE)), 1)
+    
+    expect_identical(
+        unshelf(zlibbioc, safe = FALSE),
+        c(zlibbioc = TRUE))
 })
