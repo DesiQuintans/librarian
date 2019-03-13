@@ -1,3 +1,18 @@
+# librarian 1.7.0 (2019-03-13)
+
+- FIX - You can now detach everything except R's default packages by using `safe = FALSE` in `unshelf()`. If `safe = TRUE`, the packages that you've set as default ones in your .RProfile (via `lib_startup()` for example) will not be detached. Fixes #17.
+- ADD - `check_attached()` and `check_installed()`, which lets you check the status of packages. If you run the functions with no packages named, they will return a list of all packages that are attached and installed.
+- MOD - `shelf()`, `unshelf()`, `reshelf()`, `check_attached()`, and `check_installed()` can now accept four different input methods:
+   1. A comma-separated list of bare names. `shelf(package, name, here)`
+   2. A comma-separated list of strings. `shelf("package", "name", "here")`
+   3. A comma-separated list of names and strings. `shelf("package", name, "here")`
+   4. A character vector of package names, as long as it is the only item passed in `...`. `shelf(c("package", "name", "here"))`
+   - These changes were made to accomodate the advanced input methods of `remotes`. They also make it possible to use these functions inside scripts, like passing package lists around.
+- ADD - Many new unit tests, with more stringent testing methods.
+- MOD - Major refactoring. The biggest change is that user-facing stuff like messages have been extracted from the functions so that the logic of the function is easier to maintain.
+
+
+
 # librarian 1.6.1 (2019-03-09)
 
 - FIX - `unshelf()` with `everything = TRUE` arg now detaches **all** non-default packages if `safe = FALSE` is also set. In the past, it would leave behind the packages that you had added to your .Rprofile using `lib_startup()`. This is still the default behaviour.
