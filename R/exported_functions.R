@@ -97,16 +97,40 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
     cran_pkgs <- packages[!(packages %in% github_pkgs)]  # This may also contain Bioconductor pkgs.
     all_pkgs <- append(cran_pkgs, github_bare_pkgs)
     
-    # 2a. If a package is missing from the library, install it.
-    # 2b. To force packages to update, just pretend that they're all missing.
-    if (update_all == TRUE) {
+    
+    # 2. Try to exit early by attaching packages. If not, determine which 
+    # packages are missing and need to be installed.
+    
+    if (update_all == FALSE) {
+        # 2a. If the user does not want to update packages, try to exit as soon
+        # as possible by trying to attach them. Since the user will be attaching
+        # already-installed packages more often than installing new ones, this
+        # will let shelf() exit early most of the time.
+        
+        try_require <- function(pkgs) {
+            suppressWarnings(require(pkgs, character.only = TRUE, quietly = quiet))
+        }
+        
+        # Negated so that failed attachment is TRUE
+        attach_result <- !vapply(all_pkgs, try_require, logical(1))
+        
+        if (any(attach_result)) {
+            missing_pkgs <- names(attach_result[which(any(attach_result))])
+            
+            # Only missing packages need be installed
+            cran_missing   <- cran_pkgs[which(cran_pkgs %in% missing_pkgs)]
+            github_missing <- github_pkgs[which(github_bare_pkgs %in% missing_pkgs)]
+        } else {
+            # Named logical vector of package names and TRUE if attached, just like
+            # the value check_attached() returns.
+            # Early exit.
+            return(invisible(!attach_result)) 
+        }
+    } else {
+        # 2b. To force packages to update, just pretend that they're all missing.
         cran_missing   <- cran_pkgs
         github_missing <- github_pkgs
-    } else {
-        cran_missing   <- cran_pkgs[which(!check_installed(cran_pkgs))]
-        github_missing <- github_pkgs[which(!check_installed(github_bare_pkgs))]
     }
-    
     
     if (length(cran_missing) > 0) {
         suppressWarnings(  # Warnings from trying to install non-CRAN packages (i.e. Bioconductor).
