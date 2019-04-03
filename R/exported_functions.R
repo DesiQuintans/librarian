@@ -263,7 +263,7 @@ unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, 
             # Will keep the packages that the user has in their .Rprofile.
             detach_pkgs(attached[attached %notin% rprofile_pkgs])
         } else {
-            # Will keep default packages only.
+            # Will keep R's default package list only.
             detach_pkgs(attached[attached %notin% base_pkgs])
         }
     } else {
@@ -276,7 +276,8 @@ unshelf <- function(..., everything = FALSE, also_depends = FALSE, safe = TRUE, 
             deps_chosen <- list_dependencies(pkgs_chosen)
         }
         
-        to_detach <- unique(c(pkgs_chosen, deps_chosen))
+        candidates <- unique(c(pkgs_chosen, deps_chosen))
+        to_detach <- candidates[candidates %in% attached]
         
         if (safe == TRUE) {
             # Get the dependency list of the attached packages NOT named in dots
