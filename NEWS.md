@@ -1,3 +1,10 @@
+# librarian 1.7.1 (2019-03-03)
+
+- FIX - `shelf()` now exits as soon as possible by trying to attach all packages right at the start of the function. Previously, package attachment was done only at the end, after all the other checks were done. If you set `update_all = TRUE` then the function will run package installation first and package attachment second. Closes #19.
+- FIX - `unshelf()` only acts on dependencies that are actually attached. It previously also acted on packages that were only namespaced but not attached. Closes #20.
+
+
+
 # librarian 1.7.0 (2019-03-13)
 
 - FIX - You can now detach everything except R's default packages by using `safe = FALSE` in `unshelf()`. If `safe = TRUE`, the packages that you've set as default ones in your .RProfile (via `lib_startup()` for example) will not be detached. Fixes #17.

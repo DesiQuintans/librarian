@@ -1,7 +1,7 @@
 Package: librarian
 Title: Install, Update, Load Packages from CRAN, 'GitHub', and 'Bioconductor' in One Step
-Version: 1.7.0
-Date: 2019-03-13
+Version: 1.7.1
+Date: 2019-04-03
 Authors@R: person("Desi", "Quintans", email = "science@desiquintans.com",
                   role = c("aut", "cre"))
 Description: Automatically install, update, and load 'CRAN', 'GitHub', and 'Bioconductor' 
