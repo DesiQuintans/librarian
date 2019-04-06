@@ -160,6 +160,11 @@ tell_user <- function(message, ...) {
                "nothing to detach" = 
                    "The packages were not attached, so can't be detached.",
                
+               "these packages will be installed" = 
+                   "These packages will be installed:\n\n
+                   %s \n\n
+                   It may take some time.\n\n",
+               
                stop("Invalid message name.")
         )
     

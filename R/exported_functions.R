@@ -120,6 +120,8 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
             # Only missing packages need to be installed
             cran_missing   <- cran_pkgs[which(cran_pkgs %in% missing_pkgs)]
             github_missing <- github_pkgs[which(github_bare_pkgs %in% missing_pkgs)]
+            
+            message(tell_user("these packages will be installed", missing_pkgs))
         } else {
             # Named logical vector of package names and TRUE if attached, just like
             # the value check_attached() returns.
