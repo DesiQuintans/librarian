@@ -115,9 +115,9 @@ shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask
         attach_result <- !vapply(all_pkgs, try_require, logical(1))
         
         if (any(attach_result)) {
-            missing_pkgs <- names(attach_result[which(any(attach_result))])
+            missing_pkgs <- names(attach_result[which(attach_result == TRUE)])
             
-            # Only missing packages need be installed
+            # Only missing packages need to be installed
             cran_missing   <- cran_pkgs[which(cran_pkgs %in% missing_pkgs)]
             github_missing <- github_pkgs[which(github_bare_pkgs %in% missing_pkgs)]
         } else {
