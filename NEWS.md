@@ -3,6 +3,8 @@
 - FIX - `lib_paths()` doesn't call itself as an argument in `shelf()`. Thanks, [Miles Smith](https://github.com/milescsmith/)!
 - FIX - `shelf()` now exits as soon as possible by trying to attach all packages right at the start of the function. Previously, package attachment was done only at the end, after all the other checks were done. If you set `update_all = TRUE` then the function will run package installation first and package attachment second. Closes #19.
 - FIX - `unshelf()` only acts on dependencies that are actually attached. It previously also acted on packages that were only namespaced but not attached. Closes #20.
+- FIX - `make_dirs()` no longer validates filenames that contain dots as if they were filenames, e.g. `C:/MyPath/R/3.5`.
+- FIX - `lib_paths()` shows names of non-writeable paths, instead of the result `-1`.
 
 
 
