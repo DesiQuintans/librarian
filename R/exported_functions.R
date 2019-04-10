@@ -412,10 +412,11 @@ lib_paths <- function(path, make_path = TRUE, ask = TRUE) {
     
     # Check that all folders are writeable
     permissions <- unlist(lapply(path, file.access, mode = 2))
+    
     unwriteable <- permissions[which(permissions < 0)] # -1 means dir not writeable
     
     if (length(unwriteable) > 0) {  
-        stop(tell_user("paths not writeable", unwriteable))
+        stop(tell_user("paths not writeable", names(unwriteable)))
     }
     
     # All folders should now exist, and I can add them to the lib path. There is
