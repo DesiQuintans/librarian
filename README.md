@@ -48,7 +48,7 @@ Using bare names instead of strings frees you from typing quotes all the time. H
 
 You can install _librarian_ from CRAN or from GitHub. The GitHub version is under constant development, but it has more features and it is stable for use (it's the one I personally use, after all).
 
-_Features that are currently **MISSING** from the CRAN release:_ None, we're up to date! The last CRAN release was v1.6.0 on 2019-02-22.
+_Major features that are currently **MISSING** from the CRAN release:_ No new features are missing, but some speed improvements and bug fixes are.
 
 ``` r
 # From CRAN:
