@@ -47,7 +47,11 @@ make_dirs <- function(...) {
     if (!dir.exists(pathToBuild))
         dir.create(pathToBuild, recursive = TRUE)
     
-    return(normalizePath(path, winslash = "/"))
+    # mustWork = FALSE because terminal folder names that contain a . are interpreted as
+    # references to files with an extension, and R tries to ensure that those files exist.
+    # For example: C:/MyPath/R/Library/3.5
+    # See https://github.com/DesiQuintans/librarian/issues/21
+    return(normalizePath(path, winslash = "/", mustWork = FALSE))
 }
 
 
