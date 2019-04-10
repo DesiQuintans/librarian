@@ -4,7 +4,7 @@
 \alias{shelf}
 \title{Attach packages to the search path, installing them from CRAN, GitHub, or Bioconductor if needed}
 \usage{
-shelf(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE,
+shelf(..., lib = NULL, update_all = FALSE, quiet = FALSE,
   ask = TRUE, cran_repo = getOption("repos"),
   bioc_repo = character())
 }
@@ -12,13 +12,13 @@ shelf(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE,
 \item{...}{(Names) Packages as bare names. If the package is from GitHub,
 include both the username and package name as UserName/package (see examples).}
 
-\item{lib}{(Character) The path to the folder where new packages will be installed. The
-folder will be added to the package search path. If the folder doesn't exist, you
-will be prompted to create it if \code{ask = TRUE}, otherwise it will be silently
+\item{lib}{(Character) By R convention, packages are installed to the first
+folder in your library search path (\code{lib_paths()}). Here, you can set a
+specific folder to install new packages to instead. If the folder doesn't exist,
+you will be prompted to create it if \code{ask = TRUE}, otherwise it will be silently
 created. Can be an absolute or relative path. Tilde expansion is performed on the
 input, but wildcard expansion (globbing) is not. If \code{lib} has more than one element,
-only the first one will be kept. Defaults to the current library search path. See
-the 'Details' section below for more information.}
+only the first one will be kept. See the 'Details' section below for more information.}
 
 \item{update_all}{(Logical) If \code{TRUE}, the packages will be re-installed even if they
 are already in your library.}

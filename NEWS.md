@@ -1,5 +1,6 @@
-# librarian 1.7.1 (2019-03-03)
+# librarian 1.7.2 (2019-03-11)
 
+- FIX - `lib_paths()` doesn't call itself as an argument in `shelf()`. Thanks, [Miles Smith](https://github.com/milescsmith/)!
 - FIX - `shelf()` now exits as soon as possible by trying to attach all packages right at the start of the function. Previously, package attachment was done only at the end, after all the other checks were done. If you set `update_all = TRUE` then the function will run package installation first and package attachment second. Closes #19.
 - FIX - `unshelf()` only acts on dependencies that are actually attached. It previously also acted on packages that were only namespaced but not attached. Closes #20.
 

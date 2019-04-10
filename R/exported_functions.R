@@ -7,13 +7,13 @@
 #'
 #' @param ... (Names) Packages as bare names. If the package is from GitHub,
 #'    include both the username and package name as UserName/package (see examples).
-#' @param lib (Character) The path to the folder where new packages will be installed. The 
-#'    folder will be added to the package search path. If the folder doesn't exist, you 
-#'    will be prompted to create it if `ask = TRUE`, otherwise it will be silently 
+#' @param lib (Character) By R convention, packages are installed to the first 
+#'    folder in your library search path (`lib_paths()`). Here, you can set a
+#'    specific folder to install new packages to instead. If the folder doesn't exist, 
+#'    you will be prompted to create it if `ask = TRUE`, otherwise it will be silently 
 #'    created. Can be an absolute or relative path. Tilde expansion is performed on the 
 #'    input, but wildcard expansion (globbing) is not. If `lib` has more than one element, 
-#'    only the first one will be kept. Defaults to the current library search path. See 
-#'    the 'Details' section below for more information.
+#'    only the first one will be kept. See the 'Details' section below for more information.
 #' @param update_all (Logical) If `TRUE`, the packages will be re-installed even if they
 #'    are already in your library.
 #' @param quiet (Logical) If `TRUE`, suppresses most warnings and messages.
