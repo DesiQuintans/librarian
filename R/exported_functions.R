@@ -58,7 +58,7 @@
 #' }
 #' 
 #' @md
-shelf <- function(..., lib = lib_paths(), update_all = FALSE, quiet = FALSE, ask = TRUE,
+shelf <- function(..., lib = NULL, update_all = FALSE, quiet = FALSE, ask = TRUE,
                   cran_repo = getOption("repos"), bioc_repo = character()) {
 
     # Sanitise user input
