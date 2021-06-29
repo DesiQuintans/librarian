@@ -55,9 +55,13 @@ test_that("list_dependencies() is working.", {
     
     expect_identical(
         list_dependencies("testthat"),
-        c("cli", "crayon", "digest", "magrittr", "methods", "praise", "R6", "rlang", "withr"))
+        c("brio", "callr", "cli", "crayon", "desc", "digest", "ellipsis", "evaluate", 
+          "jsonlite", "lifecycle", "magrittr", "methods", "pkgload", "praise", "processx", 
+          "ps", "R6", "rlang", "utils", "waldo", "withr"))
     
     expect_identical(
         list_dependencies(c("datasets", "testthat")),  # NULL will be removed.
-        c("cli", "crayon", "digest", "magrittr", "methods", "praise", "R6", "rlang", "withr"))
+        c("brio", "callr", "cli", "crayon", "desc", "digest", "ellipsis", "evaluate", 
+          "jsonlite", "lifecycle", "magrittr", "methods", "pkgload", "praise", "processx", 
+          "ps", "R6", "rlang", "utils", "waldo", "withr"))
 })
