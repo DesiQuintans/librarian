@@ -142,7 +142,7 @@ tell_user <- function(message, ...) {
                    %s \n\n
                    Check the spelling and capitalisation of the names.\n\n
                    Are they Bioconductor packages? If so, please install 
-                   Bioconductor.\n\n
+                   Bioconductor (BiocManager and BiocBase).\n\n
                    Are they from GitHub? If so, please supply both the GitHub 
                    username and package name, e.g. DesiQuintans/librarian",
                
@@ -151,7 +151,7 @@ tell_user <- function(message, ...) {
                    %s \n\n
                    Check the spelling and capitalisation of the names.\n\n
                    Are they Bioconductor packages? If so, please install 
-                   Bioconductor.\n\n
+                   Bioconductor (BiocManager and BiocBase).\n\n
                    Are they from GitHub? If so, please supply both the GitHub 
                    username and package name, e.g. DesiQuintans/librarian",
                
