@@ -1,3 +1,14 @@
+# librarian 1.8.0 (2021-06-29)
+
+- ADD - `stock()` lets you install packages from a list without attaching them, unlike `shelf()` which does both. Closes #26.
+- MOD - `shelf()` was refactored to pull package installation into the new `stock()` function.
+- FIX - An internal QA test was failing because the dependency list of the package `testthat` has changed since the last `librarian` version c. 2019. Updated the list.
+- FIX - Results of `stock()` and `shelf()` are now reported in the same order as the user gave them in `...`.
+- MOD - `update_all = TRUE` in `shelf()` and `stock()` now force reinstallation of a GitHub package even if the remote package's SHA1 matches the installed version. The reasoning is a) that 'forcing an update' should actually perform an update even if the files are identical, and b) in the event that some of the user's files have been changed, the stored SHA1 will not reflect this. Closes #24.
+- FIX - The "paths '-1' are not writeable" error was apparently fixed in v1.7.2, but that version was never uploaded to CRAN. Uploading it to CRAN should hopefully solve this once and for all. Closes #21. Closes #23.
+
+
+
 # librarian 1.7.2 (2019-03-11)
 
 - FIX - `lib_paths()` doesn't call itself as an argument in `shelf()`. Thanks, [Miles Smith](https://github.com/milescsmith/)!
@@ -17,7 +28,7 @@
    2. A comma-separated list of strings. `shelf("package", "name", "here")`
    3. A comma-separated list of names and strings. `shelf("package", name, "here")`
    4. A character vector of package names, as long as it is the only item passed in `...`. `shelf(c("package", "name", "here"))`
-   - These changes were made to accomodate the advanced input methods of `remotes`. They also make it possible to use these functions inside scripts, like passing package lists around.
+   - These changes were made to accommodate the advanced input methods of `remotes`. They also make it possible to use these functions inside scripts, like passing package lists around.
 - ADD - Many new unit tests, with more stringent testing methods.
 - MOD - Major refactoring. The biggest change is that user-facing stuff like messages have been extracted from the functions so that the logic of the function is easier to maintain.
 

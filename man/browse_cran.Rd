@@ -11,7 +11,7 @@ browse_cran(query, fuzzy = FALSE, echo = TRUE, ignore.case = TRUE)
 
 \item{fuzzy}{(Logical) If \code{TRUE}, enables fuzzy orderless matching. Every word in
 \code{query} (i.e. every group of characters separated with a space) will be wrapped
-with a lookaround \code{(?=*KEYWORD)}. This will match keywords regardless
+with a lookaround \verb{(?=*KEYWORD)}. This will match keywords regardless
 of the order in which those words appear.}
 
 \item{echo}{(Logical) If \code{TRUE}, print the results to the console.}

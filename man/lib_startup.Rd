@@ -46,7 +46,7 @@ packages: datasets, utils, grDevices, graphics, stats, and methods.
 }
 \examples{
 \donttest{
-lib_startup(librarian, magrittr, lib = "C:/Dropbox/My R Library")
+#> lib_startup(librarian, magrittr, lib = "C:/Dropbox/My R Library")
 }
 
 }

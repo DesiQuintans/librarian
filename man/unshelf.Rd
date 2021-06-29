@@ -4,8 +4,13 @@
 \alias{unshelf}
 \title{Detach (unload) packages from the search path}
 \usage{
-unshelf(..., everything = FALSE, also_depends = FALSE, safe = TRUE,
-  quiet = TRUE)
+unshelf(
+  ...,
+  everything = FALSE,
+  also_depends = FALSE,
+  safe = TRUE,
+  quiet = TRUE
+)
 }
 \arguments{
 \item{...}{(Names) Packages as bare names. For packages that come from GitHub, you can
@@ -39,18 +44,18 @@ All non-default packages can be detached at once too, including Librarian itself
 \donttest{
 # These are the same:
 
-unshelf(janitor, desiderata, purrr)
-unshelf(janitor, DesiQuintans/desiderata, purrr)
+#> unshelf(janitor, desiderata, purrr)
+#> unshelf(janitor, DesiQuintans/desiderata, purrr)
 
 # unshelf() returns invisibly; bind its output to a variable or access the .Last.value.
 
-print(.Last.value)
+#> print(.Last.value)
 
 #> desiderata    janitor      purrr 
 #>       TRUE       TRUE       TRUE 
 
-unshelf(everything = TRUE)
-print(.Last.value)
+#> unshelf(everything = TRUE)
+#> print(.Last.value)
 
 #> librarian testthat
 #> TRUE      TRUE

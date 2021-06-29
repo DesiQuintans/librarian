@@ -45,14 +45,22 @@
 #'
 #' @examples
 #' \donttest{
-#' shelf(fortunes, DesiQuintans/emptyRpackage, cowsay, lib = tempdir(), update_all = TRUE)
+#' stock(fortunes, DesiQuintans/emptyRpackage, cowsay, lib = tempdir(), update_all = TRUE)
 #' 
 #' # shelf() returns invisibly; bind its output to a variable or access the .Last.value.
 #' 
 #' print(.Last.value)
 #' 
-#' #> fortunes desiderata     cowsay 
-#' #>     TRUE       TRUE       TRUE
+#' #> fortunes emptyRpackage        cowsay 
+#' #>     TRUE          TRUE          TRUE 
+#' 
+#' # And to confirm that they are installed but not attached:
+#' 
+#' check_attached(fortunes, DesiQuintans/emptyRpackage, cowsay)
+#' 
+#' #> fortunes emptyRpackage        cowsay 
+#' #>    FALSE         FALSE         FALSE 
+#' 
 #' }
 #' 
 #' @md
@@ -89,10 +97,12 @@ stock <- function(..., lib = NULL, update_all = FALSE, quiet = FALSE, ask = TRUE
     
     # 1. Separate the GitHub packages from the CRAN ones. They'll contain a forward-slash.
     github_pkgs <- grep("^.*?/.*?$", packages, value = TRUE)
-    github_bare_pkgs <- sub(".*?/", "", github_pkgs)
+    github_bare_pkgs <- sub("^.*?/", "", github_pkgs)
     
     cran_pkgs <- packages[!(packages %in% github_pkgs)]  # This may also contain Bioconductor pkgs.
-    all_pkgs <- append(cran_pkgs, github_bare_pkgs)
+    # I can't just append(cran_pkgs, github_bare_pkgs) because it means that in the
+    # final output to the user, the packages are not in the same order as they are in `...`.
+    all_pkgs <- sub("^.*?/", "", packages)
     
     # 2. Don't install already-installed packages unless update_all = TRUE.
     if (update_all == FALSE) {
@@ -110,7 +120,7 @@ stock <- function(..., lib = NULL, update_all = FALSE, quiet = FALSE, ask = TRUE
         cran_missing   <- cran_pkgs[which(cran_pkgs %in% missing_pkgs)]
         github_missing <- github_pkgs[which(github_bare_pkgs %in% missing_pkgs)]
         
-        message(tell_user("these packages will be installed", names(missing_pkgs)))
+        message(tell_user("these packages will be installed", missing_pkgs))
     } else {
         # All packages are installed and we can exit early. Returns a named
         # logical vector of package names and TRUE if installed.
@@ -128,7 +138,8 @@ stock <- function(..., lib = NULL, update_all = FALSE, quiet = FALSE, ask = TRUE
     # 5. Install packages from GitHub.
     if (length(github_missing) > 0) {
         suppressWarnings(
-            remotes::install_github(github_missing, quiet = quiet, lib = lib)
+            remotes::install_github(github_missing, quiet = quiet, lib = lib,
+                                    force = TRUE)
         )
     }
     
@@ -210,134 +221,36 @@ stock <- function(..., lib = NULL, update_all = FALSE, quiet = FALSE, ask = TRUE
 #' 
 #' print(.Last.value)
 #' 
-#' #> fortunes desiderata     cowsay 
-#' #>     TRUE       TRUE       TRUE
+#' #> fortunes emptyRpackage        cowsay 
+#' #>     TRUE          TRUE          TRUE 
 #' }
 #' 
 #' @md
 shelf <- function(..., lib = NULL, update_all = FALSE, quiet = FALSE, ask = TRUE,
                   cran_repo = getOption("repos"), bioc_repo = character()) {
 
-    # Sanitise user input
-    if (dots_is_empty(...)) {
-        stop(tell_user("no packages were chosen"))
-    }
+    # 1. First, install packages with stock() as needed/requested.
+    install_results <- stock(..., lib = lib, update_all = update_all, quiet = quiet, 
+                           ask = ask, cran_repo = cran_repo, bioc_repo = bioc_repo)
     
-    packages <- nse_dots(..., keep_user = TRUE)
+    installed_pkgs <- names(install_results[which(install_results == TRUE)])
+    failed_pkgs    <- names(install_results[which(install_results == FALSE)])
     
-    # Make sure that the library path exists, and keep the first entry (it is
-    # the one that the package installation functions use.
-    lib <- lib_paths(lib, make_path = TRUE, ask = ask)[[1]]
+    # 2. Then, attach packages that are confirmed to be installed and unattached.
+    not_attached <- installed_pkgs[which(check_attached(installed_pkgs) == FALSE)]
     
-    # CRAN's repo needs to be set to a valid URL or else it will create errors
-    # in devtools::check(). 
-    if (is_valid_url(cran_repo) == FALSE) {
-        if (quiet == FALSE) {
-            if (cran_repo == "@CRAN@") {
-                # Special case for R's default CRAN placeholder value.
-                # See issue #10: https://github.com/DesiQuintans/librarian/issues/10
-                message(tell_user("fixed cran repo placeholder"))
-            } else {
-                warning(tell_user("invalid CRAN repo URL", cran_repo))
-            }
-        }
-        
-        # Default to the official CRAN site because it's future-proof.
-        cran_repo <- "https://cran.r-project.org"
-    }
-    
-    
-    # 1. Separate the GitHub packages from the CRAN ones. They'll contain a forward-slash.
-    github_pkgs <- grep("^.*?/.*?$", packages, value = TRUE)
-    github_bare_pkgs <- sub(".*?/", "", github_pkgs)
-    
-    cran_pkgs <- packages[!(packages %in% github_pkgs)]  # This may also contain Bioconductor pkgs.
-    all_pkgs <- append(cran_pkgs, github_bare_pkgs)
-    
-    
-    # 2. Try to exit early by attaching packages. If not, determine which 
-    # packages are missing and need to be installed.
-    
-    if (update_all == FALSE) {
-        # 2a. If the user does not want to update packages, try to exit as soon
-        # as possible by trying to attach them. Since the user will be attaching
-        # already-installed packages more often than installing new ones, this
-        # will let shelf() exit early most of the time.
-        
-        try_require <- function(pkgs) {
-            suppressWarnings(require(pkgs, character.only = TRUE, quietly = quiet))
-        }
-        
-        # Negated so that failed attachment is TRUE
-        attach_result <- !vapply(all_pkgs, try_require, logical(1))
-        
-        if (any(attach_result)) {
-            missing_pkgs <- names(attach_result[which(attach_result == TRUE)])
-            
-            # Only missing packages need to be installed
-            cran_missing   <- cran_pkgs[which(cran_pkgs %in% missing_pkgs)]
-            github_missing <- github_pkgs[which(github_bare_pkgs %in% missing_pkgs)]
-            
-            message(tell_user("these packages will be installed", missing_pkgs))
-        } else {
-            # Named logical vector of package names and TRUE if attached, just like
-            # the value check_attached() returns.
-            # Early exit.
-            return(invisible(!attach_result)) 
-        }
-    } else {
-        # 2b. To force packages to update, just pretend that they're all missing.
-        cran_missing   <- cran_pkgs
-        github_missing <- github_pkgs
-    }
-    
-    if (length(cran_missing) > 0) {
-        suppressWarnings(  # Warnings from trying to install non-CRAN packages (i.e. Bioconductor).
-                utils::install.packages(cran_missing, lib = lib, 
-                                        quiet = quiet, repos = cran_repo)
-        )
-    }
-    
-    if (length(github_missing) > 0) {
-        suppressWarnings(
-            remotes::install_github(github_missing, quiet = quiet, lib = lib)
-        )
-    }
-    
-    # 3. CRAN packages that failed to install may be Bioconductor packages.
-    cran_still_missing <- cran_missing[which(!check_installed(cran_missing))]
-    
-    if (length(cran_still_missing) > 0 & check_installed("Biobase") == TRUE) {
-        suppressWarnings(
-            # By my understanding, install with `suppressUpdates = TRUE` will
-            # automatically update the requested Bioconductor packages, but will NOT
-            # update all other installed packages too. I tried running it with
-            # `ask = FALSE` and it updated everything in my R installation :/
-            BiocManager::install(cran_still_missing, site_repository = bioc_repo,
-                                 update = FALSE, ask = FALSE, quiet = quiet, lib = lib)
-        )
-    }
-    
-    # 4a. Find the packages that aren't attached yet.
-    # 4b. Omit any packages that failed installation.
-    not_attached <- all_pkgs[which(check_installed(all_pkgs) == TRUE & check_attached(all_pkgs) == FALSE)]
-    failed_install <- all_pkgs[which(!check_installed(all_pkgs))]
-    
-    # 5. Attach those packages.
+    # 4. Attach those packages.
     if (length(not_attached) > 0) {
         suppressPackageStartupMessages(
             lapply(not_attached, library, character.only = TRUE, quietly = quiet)
         )
     }
     
-    if (length(failed_install) > 0) {
-        warning(tell_user("some packages failed to shelf", failed_install))
+    if (length(failed_pkgs) > 0) {
+        warning(tell_user("some packages failed to shelf", failed_pkgs))
     }
     
-    # GitHub usernames need to be removed from the final list.
-    bare_names <- sub("^.*?/", "", packages)
-    
-    return(invisible(check_attached(bare_names)))
+    return(invisible(check_attached(names(install_results))))
 }
 
 
@@ -370,18 +283,18 @@ shelf <- function(..., lib = NULL, update_all = FALSE, quiet = FALSE, ask = TRUE
 #' \donttest{
 #' # These are the same:
 #' 
-#' unshelf(janitor, desiderata, purrr)
-#' unshelf(janitor, DesiQuintans/desiderata, purrr)
+#' #> unshelf(janitor, desiderata, purrr)
+#' #> unshelf(janitor, DesiQuintans/desiderata, purrr)
 #' 
 #' # unshelf() returns invisibly; bind its output to a variable or access the .Last.value.
 #' 
-#' print(.Last.value)
+#' #> print(.Last.value)
 #' 
 #' #> desiderata    janitor      purrr 
 #' #>       TRUE       TRUE       TRUE 
 #' 
-#' unshelf(everything = TRUE)
-#' print(.Last.value)
+#' #> unshelf(everything = TRUE)
+#' #> print(.Last.value)
 #' 
 #' #> librarian testthat
 #' #> TRUE      TRUE
@@ -621,7 +534,7 @@ lib_paths <- function(path, make_path = TRUE, ask = TRUE) {
 #'
 #' @examples
 #' \donttest{
-#' lib_startup(librarian, magrittr, lib = "C:/Dropbox/My R Library")
+#' #> lib_startup(librarian, magrittr, lib = "C:/Dropbox/My R Library")
 #' }
 #' 
 #' @md

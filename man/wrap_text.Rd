@@ -23,7 +23,7 @@ wrapped <-
 wrap_text(
     "Lorem ipsum dolor sit amet, ornare justo condimentum",
     "et sit lorem! Himenaeos, vel et sodales sit.",
-    "Eu nulla. Magna ullamcorper nascetur placerat platea.\\n\\n",
+    "Eu nulla. Magna ullamcorper nascetur placerat platea.\n\n",
     "Eleifend semper velit sed aliquam, ut ligula non commodo.")
 
 cat(wrapped)
