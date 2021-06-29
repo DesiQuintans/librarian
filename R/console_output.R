@@ -137,14 +137,23 @@ tell_user <- function(message, ...) {
                    "This is not a valid URL: cran_repo = %s\n
                    Defaulting to cran_repo = 'https://cran.r-project.org'.",
                
-               "some packages failed to install" =
+               "some packages failed to stock" =
+                   "These packages failed to install:\n\n
+                   %s \n\n
+                   Check the spelling and capitalisation of the names.\n\n
+                   Are they Bioconductor packages? If so, please install 
+                   Bioconductor.\n\n
+                   Are they from GitHub? If so, please supply both the GitHub 
+                   username and package name, e.g. DesiQuintans/librarian",
+               
+               "some packages failed to shelf" =
                    "These packages failed to install and were not attached:\n\n
                    %s \n\n
                    Check the spelling and capitalisation of the names.\n\n
                    Are they Bioconductor packages? If so, please install 
-                   Bioconductor before running librarian::shelf().\n\n
-                   Are they from GitHub? Please supply both the GitHub username 
-                   and package name, e.g. DesiQuintans/librarian",
+                   Bioconductor.\n\n
+                   Are they from GitHub? If so, please supply both the GitHub 
+                   username and package name, e.g. DesiQuintans/librarian",
                
                "nothing to unshelf" =
                    "No packages were chosen for detaching. Either provide the 

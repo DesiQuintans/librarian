@@ -2,6 +2,163 @@
 # Installing, attaching, detaching packages -------------------------------
 
 
+#' Install packages from CRAN, GitHub, or Bioconductor if needed/wanted
+#'
+#' @param ... (Names) Packages as bare names. If the package is from GitHub,
+#'    include both the username and package name as UserName/package (see examples).
+#' @param lib (Character) By R convention, packages are installed to the first 
+#'    folder in your library search path (`lib_paths()`). Here, you can set a
+#'    specific folder to install new packages to instead. If the folder doesn't exist, 
+#'    you will be prompted to create it if `ask = TRUE`, otherwise it will be silently 
+#'    created. Can be an absolute or relative path. Tilde expansion is performed on the 
+#'    input, but wildcard expansion (globbing) is not. If `lib` has more than one element, 
+#'    only the first one will be kept. See the 'Details' section below for more information.
+#' @param update_all (Logical) If `TRUE`, the packages will be re-installed even if they
+#'    are already in your library.
+#' @param quiet (Logical) If `TRUE`, suppresses most warnings and messages.
+#' @param ask (Logical) If `TRUE`, and `lib` points to a folder that doesn't exist, ask 
+#'    before creating the folder. If `FALSE`, the folder will be created silently.
+#' @param cran_repo (Character) In RStudio, a default CRAN repo can be set via 
+#'    _Options > Packages > Default CRAN Mirror_). Otherwise, provide the URL to CRAN or 
+#'    one of its mirrors. If an invalid URL is given, defaults to https://cran.r-project.org.
+#' @param bioc_repo (Character) If you use Bioconductor, you can set the repo URLs for it here.
+#'    Defaults to Bioconductor's defaults (view them with `BiocInstaller::biocinstallRepos()`).
+#'
+#' @details  
+#' You may choose to organise your library into folders to hold packages for different 
+#' tasks or projects. If you specify a `lib` folder, it will be created (if needed) and 
+#' attached to the package search path. R will look for packages by working through the 
+#' package search path in order. You can view the folders that are on this path by 
+#' calling `lib_paths()` with no arguments.
+#' 
+#' If you specify a new `lib` and use the argument `update_all = TRUE` to force an 
+#' already-installed package to reinstall, a new copy of that package will be made in 
+#' `lib` and then loaded from there. This means that you can potentially have several 
+#' copies of the same package across many folders on your machine, each a different 
+#' version. This allows you to maintain a different library folder for different projects, 
+#' so that updated packages in Project B will not affect the package versions you rely on 
+#' for Project A.
+#'
+#' @return Invisibly returns a named logical vector, where the names are the packages 
+#'    requested in `...` and `TRUE` means that the package was successfully installed.
+#' @export
+#'
+#' @examples
+#' \donttest{
+#' shelf(fortunes, DesiQuintans/emptyRpackage, cowsay, lib = tempdir(), update_all = TRUE)
+#' 
+#' # shelf() returns invisibly; bind its output to a variable or access the .Last.value.
+#' 
+#' print(.Last.value)
+#' 
+#' #> fortunes desiderata     cowsay 
+#' #>     TRUE       TRUE       TRUE
+#' }
+#' 
+#' @md
+stock <- function(..., lib = NULL, update_all = FALSE, quiet = FALSE, ask = TRUE,
+                  cran_repo = getOption("repos"), bioc_repo = character()) {
+    # Sanitise user input
+    if (dots_is_empty(...)) {
+        stop(tell_user("no packages were chosen"))
+    }
+    
+    packages <- nse_dots(..., keep_user = TRUE)
+    
+    # Make sure that the library path exists, and keep the first entry (it is
+    # the one that the package installation functions use.
+    lib <- lib_paths(lib, make_path = TRUE, ask = ask)[[1]]
+    
+    # CRAN's repo needs to be set to a valid URL or else it will create errors
+    # in devtools::check(). 
+    if (is_valid_url(cran_repo) == FALSE) {
+        if (quiet == FALSE) {
+            if (cran_repo == "@CRAN@") {
+                # Special case for R's default CRAN placeholder value.
+                # See issue #10: https://github.com/DesiQuintans/librarian/issues/10
+                message(tell_user("fixed cran repo placeholder"))
+            } else {
+                warning(tell_user("invalid CRAN repo URL", cran_repo))
+            }
+        }
+        
+        # Default to the official CRAN site because it's future-proof.
+        cran_repo <- "https://cran.r-project.org"
+    }
+    
+    
+    # 1. Separate the GitHub packages from the CRAN ones. They'll contain a forward-slash.
+    github_pkgs <- grep("^.*?/.*?$", packages, value = TRUE)
+    github_bare_pkgs <- sub(".*?/", "", github_pkgs)
+    
+    cran_pkgs <- packages[!(packages %in% github_pkgs)]  # This may also contain Bioconductor pkgs.
+    all_pkgs <- append(cran_pkgs, github_bare_pkgs)
+    
+    # 2. Don't install already-installed packages unless update_all = TRUE.
+    if (update_all == FALSE) {
+        # 2a. Which packages are not installed?
+        missing_pkgs <- !check_installed(all_pkgs)  # Negated so TRUE = missing.
+        missing_pkgs <- missing_pkgs[which(missing_pkgs == TRUE)]
+    } else {
+        # 2b. If update_all == TRUE, then pretend that none of the packages
+        # are installed yet.
+        missing_pkgs <- all_pkgs
+    }
+    
+    # 3. Only missing packages need to be installed.
+    if (length(missing_pkgs) > 0) {
+        cran_missing   <- cran_pkgs[which(cran_pkgs %in% missing_pkgs)]
+        github_missing <- github_pkgs[which(github_bare_pkgs %in% missing_pkgs)]
+        
+        message(tell_user("these packages will be installed", names(missing_pkgs)))
+    } else {
+        # All packages are installed and we can exit early. Returns a named
+        # logical vector of package names and TRUE if installed.
+        return(invisible(check_installed(all_pkgs))) 
+    }
+        
+    # 4. Install packages from CRAN.
+    if (length(cran_missing) > 0) {
+        suppressWarnings(  # Warnings from trying to install non-CRAN packages (i.e. Bioconductor).
+            utils::install.packages(cran_missing, lib = lib, 
+                                    quiet = quiet, repos = cran_repo)
+        )
+    }
+    
+    # 5. Install packages from GitHub.
+    if (length(github_missing) > 0) {
+        suppressWarnings(
+            remotes::install_github(github_missing, quiet = quiet, lib = lib)
+        )
+    }
+    
+    # 6. CRAN packages that failed to install may be Bioconductor packages.
+    cran_still_missing <- cran_missing[which(!check_installed(cran_missing))]
+    
+    if (length(cran_still_missing) > 0 & check_installed("Biobase") == TRUE) {
+        suppressWarnings(
+            # By my understanding, install with `suppressUpdates = TRUE` will
+            # automatically update the requested Bioconductor packages, but will NOT
+            # update all other installed packages too. I tried running it with
+            # `ask = FALSE` and it updated everything in my R installation :/
+            BiocManager::install(cran_still_missing, site_repository = bioc_repo,
+                                 update = FALSE, ask = FALSE, quiet = quiet, lib = lib)
+        )
+    }
+    
+    # 4a. Find the packages that aren't attached yet.
+    # 4b. Omit any packages that failed installation.
+    post_install <- all_pkgs[which(check_installed(all_pkgs) == TRUE)]
+    failed_install <- all_pkgs[which(!check_installed(all_pkgs))]
+    
+    # 5. Explicitly warn the user is some packages did not install.
+    if (length(failed_install) > 0) {
+        warning(tell_user("some packages failed to stock", failed_install))
+    }
+    
+    return(invisible(check_installed(all_pkgs)))
+}
+
 
 #' Attach packages to the search path, installing them from CRAN, GitHub, or Bioconductor if needed
 #'
@@ -174,7 +331,7 @@ shelf <- function(..., lib = NULL, update_all = FALSE, quiet = FALSE, ask = TRUE
     }
     
     if (length(failed_install) > 0) {
-        warning(tell_user("some packages failed to install", failed_install))
+        warning(tell_user("some packages failed to shelf", failed_install))
     }
     
     # GitHub usernames need to be removed from the final list.
