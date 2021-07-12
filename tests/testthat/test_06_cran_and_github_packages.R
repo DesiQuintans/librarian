@@ -2,7 +2,7 @@ context("Installing packages from CRAN and GitHub")
 
 
 
-test_that("Install fortunes (CRAN) and emptyRpackage (GitHub)", {
+test_that("Force-install fortunes (CRAN) and emptyRpackage (GitHub)", {
     skip_on_cran()
     
     expect_identical(
@@ -37,4 +37,36 @@ test_that("Try to unshelf() fortunes and emptyRpackage", {
         c(fortunes = TRUE, emptyRpackage = TRUE)
     )
 })
+    
+# Remove emptyRpackage and fortunes before retesting with update_all = FALSE
+remove.packages(c("fortunes", "emptyRpackage"))
 
+
+test_that("Soft-install fortunes (CRAN) and emptyRpackage (GitHub)", {
+    skip_on_cran()
+    
+    expect_identical(
+        shhh(shelf(fortunes, lib = tempdir(), quiet = TRUE, update_all = FALSE)),
+        c(fortunes = TRUE)
+    )
+    
+    expect_type(fortunes::fortune(), "list")
+    
+    expect_identical(
+        shhh(shelf(DesiQuintans/emptyRpackage, lib = tempdir(), quiet = TRUE, update_all = FALSE)),
+        c(emptyRpackage = TRUE))
+    
+    expect_identical(
+        emptyRpackage::hello_emptyR(), 
+        "emptyRpackage is installed!")
+})
+
+
+test_that("Try to unshelf() fortunes and emptyRpackage", {
+    skip_on_cran()
+    
+    expect_identical(
+        unshelf(fortunes, DesiQuintans/emptyRpackage, safe = FALSE),
+        c(fortunes = TRUE, emptyRpackage = TRUE)
+    )
+})

@@ -34,7 +34,24 @@ test_that("BiocManager and Biobase can be installed.", {
 })
 
 
-test_that("Bioconductor packages can be installed when Biobase is installed.", {
+test_that("Bioconductor packages can be soft-installed when Biobase is installed.", {
+    skip_on_cran()
+    
+    expect_identical(
+        shhh(shelf(zlibbioc, lib = tempdir(), quiet = TRUE, update_all = FALSE)),
+        c(zlibbioc = TRUE)
+    )
+})
+
+test_that("Try to unshelf() zlibbioc", {
+    skip_on_cran()
+    
+    expect_identical(
+        unshelf(zlibbioc, safe = FALSE),
+        c(zlibbioc = TRUE))
+})
+
+test_that("Bioconductor packages can be force-installed when Biobase is installed.", {
     skip_on_cran()
     
     expect_identical(
@@ -49,4 +66,21 @@ test_that("Try to unshelf() zlibbioc", {
     expect_identical(
         unshelf(zlibbioc, safe = FALSE),
         c(zlibbioc = TRUE))
+})
+
+# Uninstall zlibbioc
+test_that("Try uninstalling zlibbioc", {
+    skip_on_cran()
+    
+    expect_identical(
+        check_installed(zlibbioc),
+        c(zlibbioc = TRUE))
+    
+    expect_message(
+        remove.packages("zlibbioc"),
+        paste0("Removing package from ‘", .libPaths()[[1]], "’"))
+    
+    expect_identical(
+        check_installed(zlibbioc),
+        c(zlibbioc = FALSE))
 })

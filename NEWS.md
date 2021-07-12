@@ -1,3 +1,11 @@
+# librarian 1.8.1 (2021-07-12)
+
+- FIX - There was an issue where brand new GitHub packages wouldn't be installed unless `update_all = TRUE`. Closes #27.
+- FIX - Changed link to CONDUCT.md in README to an absolute link for CRAN resubmission.
+- FIX - Removed `LazyData` from DESCRIPTION for CRAN resubmission.
+- FIX - Cached data is no longer used when checking if a package is installed.
+
+
 # librarian 1.8.0 (2021-06-29)
 
 - ADD - `stock()` lets you install packages from a list without attaching them, unlike `shelf()` which does both. Closes #26.

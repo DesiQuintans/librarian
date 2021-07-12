@@ -1,7 +1,7 @@
 Package: librarian
 Title: Install, Update, Load Packages from CRAN, 'GitHub', and 'Bioconductor' in One Step
-Version: 1.8.0
-Date: 2021-06-29
+Version: 1.8.1
+Date: 2021-07-12
 Authors@R: person("Desi", "Quintans", email = "science@desiquintans.com",
                   role = c("aut", "cre"))
 Description: Automatically install, update, and load 'CRAN', 'GitHub', and 'Bioconductor' 
@@ -17,7 +17,6 @@ Imports:
     remotes,
     tools,
     utils
-LazyData: true
 RoxygenNote: 7.1.1
 Suggests: 
     testthat,

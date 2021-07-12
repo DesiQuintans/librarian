@@ -147,13 +147,9 @@ tell_user <- function(message, ...) {
                    username and package name, e.g. DesiQuintans/librarian",
                
                "some packages failed to shelf" =
-                   "These packages failed to install and were not attached:\n\n
+                   "These packages are not installed, so they were not attached:\n\n
                    %s \n\n
-                   Check the spelling and capitalisation of the names.\n\n
-                   Are they Bioconductor packages? If so, please install 
-                   Bioconductor (BiocManager and BiocBase).\n\n
-                   Are they from GitHub? If so, please supply both the GitHub 
-                   username and package name, e.g. DesiQuintans/librarian",
+                   Did they fail to install? Are they spelled correctly?",
                
                "nothing to unshelf" =
                    "No packages were chosen for detaching. Either provide the 

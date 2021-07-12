@@ -8,6 +8,11 @@
 - R-hub (Ubuntu Linux 16.04 LTS, R-release)
 
 
+## Resubmission notes
+
+Changed link to CONDUCT.md in README to an absolute link for CRAN resubmission.
+
+
 ## R CMD check results
 
 There were no ERRORs or WARNINGs or NOTEs for the local R version that I tested.
@@ -18,6 +23,7 @@ R-hub produced one error because it ran a \donttest code example:
 
     > Error: Bioconductor does not yet build and check packages for R version 4.2; 
       see https://bioconductor.org/install
+
 
 ## Reverse dependencies
 

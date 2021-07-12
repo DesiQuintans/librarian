@@ -23,7 +23,7 @@
 #' @md
 check_pkg_status <- function(..., status, use_list = FALSE) {
     list <- switch(status, 
-                   installed = rownames(utils::installed.packages()),
+                   installed = rownames(utils::installed.packages(noCache = TRUE)),
                    attached  = .packages())
     
     if (dots_is_empty(...)) {

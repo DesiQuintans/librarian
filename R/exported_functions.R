@@ -107,8 +107,7 @@ stock <- function(..., lib = NULL, update_all = FALSE, quiet = FALSE, ask = TRUE
     # 2. Don't install already-installed packages unless update_all = TRUE.
     if (update_all == FALSE) {
         # 2a. Which packages are not installed?
-        missing_pkgs <- !check_installed(all_pkgs)  # Negated so TRUE = missing.
-        missing_pkgs <- missing_pkgs[which(missing_pkgs == TRUE)]
+        missing_pkgs <- all_pkgs[which(check_installed(all_pkgs) == FALSE)]
     } else {
         # 2b. If update_all == TRUE, then pretend that none of the packages
         # are installed yet.
@@ -162,7 +161,7 @@ stock <- function(..., lib = NULL, update_all = FALSE, quiet = FALSE, ask = TRUE
     post_install <- all_pkgs[which(check_installed(all_pkgs) == TRUE)]
     failed_install <- all_pkgs[which(!check_installed(all_pkgs))]
     
-    # 5. Explicitly warn the user is some packages did not install.
+    # 5. Explicitly warn the user if some packages did not install.
     if (length(failed_install) > 0) {
         warning(tell_user("some packages failed to stock", failed_install))
     }
