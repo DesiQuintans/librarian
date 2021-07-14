@@ -92,6 +92,7 @@ More in-depth documentation for each function is in the [Examples section](#exam
 | `shelf()`       | `shelf(cowsay, DesiQuintans/desiderata)` | Attach packages to the search path, installing them from CRAN, Bioconductor, or GitHub if needed. They will be installed to the first folder in `lib_paths()`. |
 | `unshelf()`     | `unshelf(cowsay, desiderata)`            | Detach packages from the search path. You can also detach their dependencies.                                                                                  |
 | `reshelf()`     | `reshelf(desiderata)`                    | Detach and then reattach packages, helpful for refreshing a personal package.                                                                                  |
+| `stock()`   | `stock(cowsay, DesiQuintans/desiderata)`         | Install packages without attaching them.                                        |
 | `lib_paths()`   | `lib_paths("C:/new_lib_folder")`         | View and edit the folders where R will install and search for packages.                                                                                        |
 | `lib_startup()` | `lib_startup(librarian, forcats)`        | Automatically attach libraries and packages at the start of every R session.                                                                                   |
 | `browse_cran()` | `browse_cran("linear regression")`       | Discover CRAN packages by keyword search or regular expression.                                                                                                |
@@ -230,6 +231,18 @@ reshelf(DesiQuintans/desiderata)
 
 unshelf(DesiQuintans/desiderata, safe = FALSE, warn = FALSE))
   shelf(DesiQuintans/desiderata)
+```
+
+---
+
+### stock
+
+`stock()` installs packages _without_ attaching them. This is useful if you only want to ensure that a package is installed before you refer to it by namespace.
+
+``` r
+stock(DesiQuintans/desiderata)
+
+desiderata::Mode(...)
 ```
 
 ---
