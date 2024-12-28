@@ -1,3 +1,14 @@
+# Discontinued
+
+Hello, `librarian` is discontinued as of 2024-12-28, and no further maintenance or development will be done to it. I have made this decision because my thoughts regarding package installation and loading have changed in the 6.5 years since I started this package. Namely:
+
+1. **A large block of `library()` is okay, actually.** It is easy to copy, paste, delete, and remove entire packages when each package is on a new line.
+2. **Installation of packages is better handled by [`pak`](https://pak.r-lib.org/) than anything else.** Like `librarian`, the `pak` package automates the installation of multiple packages at a time from CRAN, Bioconductor, GitHub, and other sources. _Unlike_ `librarian`, `pak` does it a) in parallel, b) without re-installing the package when no changes have been made, c) with fewer collisions with packages that are already attached to the session, and d) with support for [`renv`](https://rstudio.github.io/renv/index.html).
+
+---------------------------------------------------------------------
+
+
+
 # `librarian` - One-step packages from CRAN, GitHub, and Bioconductor
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/librarian)](https://cran.r-project.org/package=librarian)
